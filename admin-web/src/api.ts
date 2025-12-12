@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Use environment variable or default to relative path for production
+// Use environment variable for local dev, otherwise fallback to relative path /api for production
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
