@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Use environment variable for local dev, otherwise fallback to relative path /api for production
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+// Force relative path in production to ensure we use the same domain (and avoid CORS/localhost issues)
+const API_URL = import.meta.env.PROD ? '/api' : (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api');
 
 const api = axios.create({
     baseURL: API_URL,
