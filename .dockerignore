@@ -1,0 +1,10 @@
+node_modules
+*.log
+.DS_Store
+backend/venv
+backend/__pycache__
+admin-web/node_modules
+.git
+.expo
+dist
+web-build

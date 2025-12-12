@@ -1,0 +1,60 @@
+
+export const CATEGORIES = [
+  { id: '1', name: 'Burgers', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80' },
+  { id: '2', name: 'Pizza', image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&q=80' },
+  { id: '3', name: 'Sushi', image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500&q=80' },
+  { id: '4', name: 'Drinks', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=500&q=80' },
+];
+
+export const POPULAR_ITEMS = [
+  {
+    id: '1',
+    name: 'Double Cheeseburger',
+    description: 'Two beef patties, cheddar cheese, lettuce, tomato, and house sauce.',
+    price: 12.99,
+    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80',
+    categoryId: '1',
+    rating: 4.8,
+    calories: 850,
+  },
+  {
+    id: '2',
+    name: 'Pepperoni Pizza',
+    description: 'Classic pepperoni pizza with mozzarella cheese and tomato sauce.',
+    price: 14.99,
+    image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=500&q=80',
+    categoryId: '2',
+    rating: 4.7,
+    calories: 1200,
+  },
+  {
+    id: '3',
+    name: 'Salmon Nigiri',
+    description: 'Fresh salmon over seasoned sushi rice.',
+    price: 8.99,
+    image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500&q=80',
+    categoryId: '3',
+    rating: 4.9,
+    calories: 300,
+  },
+  {
+    id: '4',
+    name: 'Cola',
+    description: 'Chilled cola drink.',
+    price: 2.99,
+    image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80',
+    categoryId: '4',
+    rating: 4.5,
+    calories: 150,
+  },
+  {
+    id: '5',
+    name: 'Mushroom Burger',
+    description: 'Beef patty with sautéed mushrooms and swiss cheese.',
+    price: 13.49,
+    image: 'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=500&q=80',
+    categoryId: '1',
+    rating: 4.6,
+    calories: 780,
+  },
+];
