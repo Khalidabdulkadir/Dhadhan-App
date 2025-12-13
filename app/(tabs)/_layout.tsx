@@ -1,6 +1,5 @@
-
 import { Tabs } from 'expo-router';
-import { Home, ShoppingCart, User, UtensilsCrossed } from 'lucide-react-native';
+import { Home, Search, ShoppingCart, User, UtensilsCrossed } from 'lucide-react-native';
 import React from 'react';
 import { useColorScheme } from 'react-native';
 
