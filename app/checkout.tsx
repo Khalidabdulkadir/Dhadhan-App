@@ -339,6 +339,7 @@ const styles = StyleSheet.create({
         right: 0,
         backgroundColor: '#FFF',
         padding: 20,
+        paddingBottom: Platform.OS === 'ios' ? 20 : 90,
         borderTopWidth: 1,
         borderTopColor: '#F0F0F0',
     },

@@ -74,20 +74,26 @@ export default function HomeScreen() {
   );
 
   const renderPromotion = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.promotionCard} onPress={() => router.push(`/product/${item.id}`)}>
-      <Image source={{ uri: item.image }} style={styles.promotionImage} />
+    <TouchableOpacity style={styles.popularCard} onPress={() => router.push(`/product/${item.id}`)}>
+      <Image source={{ uri: item.image }} style={styles.popularImage} />
       {item.discount_percentage > 0 && (
-        <View style={styles.discountBadge}>
-          <Text style={styles.discountText}>{item.discount_percentage}% OFF</Text>
+        <View style={styles.promotionTag}>
+          <Text style={styles.promotionTagText}>{item.discount_percentage}% OFF</Text>
         </View>
       )}
-      <View style={styles.promotionInfo}>
-        <Text style={styles.promotionName} numberOfLines={1}>{item.name}</Text>
-        <View style={styles.promotionPriceRow}>
-          {item.discount_percentage > 0 && (
-            <Text style={styles.originalPrice}>KSh {item.price}</Text>
-          )}
-          <Text style={styles.promotionPrice}>KSh {item.discounted_price}</Text>
+      <View style={styles.popularInfo}>
+        <Text style={styles.popularName}>{item.name}</Text>
+        <Text style={styles.popularDescription} numberOfLines={2}>{item.description}</Text>
+        <View style={styles.priceRow}>
+          <View style={styles.priceColumn}>
+            {item.discount_percentage > 0 && (
+              <Text style={styles.originalPriceSmall}>KSh {item.price}</Text>
+            )}
+            <Text style={styles.popularPrice}>KSh {item.discounted_price}</Text>
+          </View>
+          <View style={styles.ratingContainer}>
+            <Text style={styles.ratingText}>★ {item.rating}</Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -176,18 +182,15 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
 
-        {/* Promotions */}
+        {/* Special Offers - Vertical */}
         {promotions.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>🔥 Special Offers</Text>
-            <FlatList
-              data={promotions}
-              renderItem={renderPromotion}
-              keyExtractor={(item) => item.id.toString()}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingRight: 20 }}
-            />
+            {promotions.map((item) => (
+              <View key={item.id} style={{ marginBottom: 16 }}>
+                {renderPromotion({ item })}
+              </View>
+            ))}
           </View>
         )}
 
