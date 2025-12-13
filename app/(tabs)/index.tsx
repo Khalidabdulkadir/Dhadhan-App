@@ -184,6 +184,17 @@ export default function HomeScreen() {
           />
         </View>
 
+        {/* Banner - Click to view menu */}
+        <TouchableOpacity style={styles.bannerContainer} onPress={() => router.push('/(tabs)/menu')}>
+          <Image
+            source={{ uri: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80' }}
+            style={styles.bannerImage}
+          />
+          <View style={styles.bannerOverlay}>
+            <Text style={styles.bannerText}>Get 20% Discount</Text>
+            <Text style={styles.bannerSubtext}>On your first order</Text>
+          </View>
+        </TouchableOpacity>
 
 
         {/* Promotions */}
