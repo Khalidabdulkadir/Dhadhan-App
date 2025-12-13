@@ -3,9 +3,9 @@ import Skeleton from '@/components/Skeleton';
 import api from '@/constants/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'expo-router';
-import { Search, User } from 'lucide-react-native';
+import { User } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Image, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
@@ -16,7 +16,6 @@ export default function HomeScreen() {
   const [promotions, setPromotions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     checkAuth();
@@ -50,12 +49,6 @@ export default function HomeScreen() {
     setRefreshing(true);
     fetchData();
   }, []);
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      router.push({ pathname: '/(tabs)/menu', params: { q: searchQuery } });
-    }
-  };
 
   const renderCategory = ({ item }: { item: any }) => (
     <TouchableOpacity style={styles.categoryCard} onPress={() => router.push('/(tabs)/menu')}>
@@ -168,20 +161,6 @@ export default function HomeScreen() {
               </View>
             )}
           </TouchableOpacity>
-        </View>
-
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <Search color="#666" size={18} />
-          <TextInput
-            placeholder="Search food..."
-            style={styles.searchInput}
-            placeholderTextColor="#999"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            onSubmitEditing={handleSearch}
-            returnKeyType="search"
-          />
         </View>
 
         {/* Banner - Click to view menu */}
