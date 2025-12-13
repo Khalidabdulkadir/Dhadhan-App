@@ -68,16 +68,28 @@ export default function MenuScreen() {
         </TouchableOpacity>
     );
 
+
     const renderItem = ({ item }: { item: any }) => (
-        <TouchableOpacity style={styles.menuItem} onPress={() => router.push(`/product/${item.id}` as any)}>
-            <Image source={{ uri: item.image }} style={styles.itemImage} />
-            <View style={styles.itemInfo}>
-                <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemDesc} numberOfLines={2}>{item.description}</Text>
-                <Text style={styles.itemPrice}>KSh {item.price}</Text>
-            </View>
-            <View style={styles.addButton}>
-                <Text style={styles.addButtonText}>+</Text>
+        <TouchableOpacity style={styles.gridItem} onPress={() => router.push(`/product/${item.id}` as any)}>
+            <Image source={{ uri: item.image }} style={styles.gridImage} />
+            {item.is_promoted && item.discount_percentage > 0 && (
+                <View style={styles.discountBadge}>
+                    <Text style={styles.discountText}>{item.discount_percentage}% OFF</Text>
+                </View>
+            )}
+            <View style={styles.gridInfo}>
+                <Text style={styles.gridName} numberOfLines={1}>{item.name}</Text>
+                <Text style={styles.gridDesc} numberOfLines={2}>{item.description}</Text>
+                <View style={styles.gridPriceRow}>
+                    {item.is_promoted && item.discount_percentage > 0 ? (
+                        <View>
+                            <Text style={styles.gridOriginalPrice}>KSh {item.price}</Text>
+                            <Text style={styles.gridPrice}>KSh {item.discounted_price}</Text>
+                        </View>
+                    ) : (
+                        <Text style={styles.gridPrice}>KSh {item.price}</Text>
+                    )}
+                </View>
             </View>
         </TouchableOpacity>
     );
@@ -147,6 +159,8 @@ export default function MenuScreen() {
                 data={filteredItems}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
+                numColumns={2}
+                columnWrapperStyle={styles.row}
                 contentContainerStyle={styles.menuList}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
@@ -230,8 +244,71 @@ const styles = StyleSheet.create({
         color: '#FFF',
     },
     menuList: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
         paddingBottom: 20,
+    },
+    row: {
+        justifyContent: 'space-between',
+        paddingHorizontal: 10,
+    },
+    gridItem: {
+        width: '48%',
+        backgroundColor: '#FFF',
+        borderRadius: 12,
+        marginBottom: 15,
+        overflow: 'hidden',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+    },
+    gridImage: {
+        width: '100%',
+        height: 140,
+    },
+    discountBadge: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        backgroundColor: '#FF4500',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 6,
+    },
+    discountText: {
+        color: '#FFF',
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+    gridInfo: {
+        padding: 12,
+    },
+    gridName: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 4,
+    },
+    gridDesc: {
+        fontSize: 11,
+        color: '#888',
+        marginBottom: 8,
+    },
+    gridPriceRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    gridOriginalPrice: {
+        fontSize: 11,
+        color: '#999',
+        textDecorationLine: 'line-through',
+        marginBottom: 2,
+    },
+    gridPrice: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#FF4500',
     },
     menuItem: {
         flexDirection: 'row',
