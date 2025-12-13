@@ -79,7 +79,7 @@ export default function LoginScreen() {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
             >
-                <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: Platform.OS === 'ios' ? 20 : 100 }]}>
+                <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: Platform.OS === 'ios' ? 20 : 150 }]}>
                     <View style={styles.content}>
                         <Image
                             source={{ uri: 'https://img.freepik.com/premium-vector/restaurant-logo-design-template_79169-56.jpg' }}

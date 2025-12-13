@@ -41,7 +41,7 @@ export default function RegisterScreen() {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
             >
-                <ScrollView contentContainerStyle={[styles.content, { paddingBottom: Platform.OS === 'ios' ? 20 : 100 }]}>
+                <ScrollView contentContainerStyle={[styles.content, { paddingBottom: Platform.OS === 'ios' ? 20 : 150 }]}>
                     <View style={styles.headerContainer}>
                         <Image
                             source={{ uri: 'https://img.freepik.com/premium-vector/restaurant-logo-design-template_79169-56.jpg' }}
