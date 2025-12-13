@@ -13,6 +13,7 @@ export default function HomeScreen() {
   const { user, checkAuth } = useAuthStore();
   const [categories, setCategories] = useState<any[]>([]);
   const [popularItems, setPopularItems] = useState<any[]>([]);
+  const [promotions, setPromotions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,8 +30,14 @@ export default function HomeScreen() {
         api.get('/products/')
       ]);
       setCategories(catRes.data);
-      // For popular items, we just take the first 5 products for now
-      setPopularItems(prodRes.data.slice(0, 5));
+
+      // Filter promoted products
+      const promotedProducts = prodRes.data.filter((p: any) => p.is_promoted);
+      setPromotions(promotedProducts);
+
+      // For popular items, get non-promoted high-rated products
+      const nonPromoted = prodRes.data.filter((p: any) => !p.is_promoted);
+      setPopularItems(nonPromoted.slice(0, 5));
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -68,6 +75,26 @@ export default function HomeScreen() {
           <View style={styles.ratingContainer}>
             <Text style={styles.ratingText}>★ {item.rating}</Text>
           </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderPromotion = ({ item }: { item: any }) => (
+    <TouchableOpacity style={styles.promotionCard} onPress={() => router.push(`/product/${item.id}`)}>
+      <Image source={{ uri: item.image }} style={styles.promotionImage} />
+      {item.discount_percentage > 0 && (
+        <View style={styles.discountBadge}>
+          <Text style={styles.discountText}>{item.discount_percentage}% OFF</Text>
+        </View>
+      )}
+      <View style={styles.promotionInfo}>
+        <Text style={styles.promotionName} numberOfLines={1}>{item.name}</Text>
+        <View style={styles.promotionPriceRow}>
+          {item.discount_percentage > 0 && (
+            <Text style={styles.originalPrice}>KSh {item.price}</Text>
+          )}
+          <Text style={styles.promotionPrice}>KSh {item.discounted_price}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -168,6 +195,21 @@ export default function HomeScreen() {
             <Text style={styles.bannerSubtext}>On your first order</Text>
           </View>
         </View>
+
+        {/* Promotions */}
+        {promotions.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>🔥 Special Offers</Text>
+            <FlatList
+              data={promotions}
+              renderItem={renderPromotion}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingRight: 20 }}
+            />
+          </View>
+        )}
 
         {/* Categories */}
         <View style={styles.section}>
@@ -368,6 +410,60 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     color: '#FFB800',
+  },
+  promotionCard: {
+    width: 200,
+    marginRight: 15,
+    backgroundColor: '#FFF',
+    borderRadius: 15,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  promotionImage: {
+    width: '100%',
+    height: 140,
+  },
+  discountBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#FF4500',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+  discountText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  promotionInfo: {
+    padding: 12,
+  },
+  promotionName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 6,
+  },
+  promotionPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  originalPrice: {
+    fontSize: 12,
+    color: '#999',
+    textDecorationLine: 'line-through',
+  },
+  promotionPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FF4500',
   },
   guestProfile: {
     backgroundColor: '#E0E0E0',

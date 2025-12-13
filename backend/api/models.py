@@ -17,9 +17,18 @@ class Product(models.Model):
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     rating = models.FloatField(default=0.0)
     calories = models.IntegerField(default=0)
+    is_promoted = models.BooleanField(default=False)
+    discount_percentage = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
+    
+    @property
+    def discounted_price(self):
+        if self.is_promoted and self.discount_percentage > 0:
+            discount = (self.price * self.discount_percentage) / 100
+            return self.price - discount
+        return self.price
 
 class Order(models.Model):
     STATUS_CHOICES = [

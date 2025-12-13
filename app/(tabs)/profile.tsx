@@ -3,7 +3,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'expo-router';
 import { ChevronRight, Clock, LogOut, MapPin, Settings } from 'lucide-react-native';
 import React, { useEffect } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
@@ -49,10 +49,11 @@ export default function ProfileScreen() {
 
             <ScrollView contentContainerStyle={styles.content}>
                 <View style={styles.profileCard}>
-                    <Image
-                        source={{ uri: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=500&q=80' }}
-                        style={styles.avatar}
-                    />
+                    <View style={styles.avatar}>
+                        <Text style={styles.avatarText}>
+                            {user.first_name?.charAt(0)}{user.last_name?.charAt(0)}
+                        </Text>
+                    </View>
                     <View style={styles.profileInfo}>
                         <Text style={styles.name}>{user.first_name} {user.last_name}</Text>
                         <Text style={styles.email}>{user.email}</Text>
@@ -149,6 +150,14 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
+        backgroundColor: '#FF4500',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    avatarText: {
+        color: '#FFF',
+        fontSize: 24,
+        fontWeight: 'bold',
     },
     profileInfo: {
         flex: 1,

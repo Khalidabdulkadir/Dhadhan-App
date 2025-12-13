@@ -4,7 +4,7 @@ import { useCartStore } from '@/store/useCartStore';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Minus, Plus, Star } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ProductDetailsScreen() {
     const { id } = useLocalSearchParams();
@@ -64,7 +64,7 @@ export default function ProductDetailsScreen() {
     return (
         <View style={styles.container}>
             <Stack.Screen options={{ headerShown: false }} />
-            <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+            <ScrollView contentContainerStyle={{ paddingBottom: Platform.OS === 'ios' ? 180 : 160 }}>
                 <View style={styles.imageContainer}>
                     <Image source={{ uri: product.image }} style={styles.image} />
                     <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
@@ -91,7 +91,7 @@ export default function ProductDetailsScreen() {
                 </View>
             </ScrollView>
 
-            <View style={styles.footer}>
+            <View style={[styles.footer, { paddingBottom: Platform.OS === 'ios' ? 40 : 30 }]}>
                 <View style={styles.quantityControl}>
                     <TouchableOpacity
                         style={styles.quantityButton}

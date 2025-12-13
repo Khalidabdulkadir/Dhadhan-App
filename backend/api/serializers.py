@@ -27,9 +27,11 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):
+    discounted_price = serializers.ReadOnlyField()
+    
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'price', 'image', 'category', 'rating', 'calories', 'is_promoted', 'discount_percentage', 'discounted_price']
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.ReadOnlyField(source='product.name')
