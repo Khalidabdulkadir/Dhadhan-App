@@ -2,7 +2,7 @@
 import Skeleton from '@/components/Skeleton';
 import api from '@/constants/api';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Filter, Search } from 'lucide-react-native';
+import { Search } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Image, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -131,7 +131,7 @@ export default function MenuScreen() {
             </View>
 
             <View style={styles.searchContainer}>
-                <Search color="#666" size={20} />
+                <Search color="#666" size={18} />
                 <TextInput
                     placeholder="Search food..."
                     style={styles.searchInput}
@@ -139,9 +139,6 @@ export default function MenuScreen() {
                     onChangeText={setSearchQuery}
                     placeholderTextColor="#999"
                 />
-                <TouchableOpacity style={styles.filterButton}>
-                    <Filter color="#FFF" size={20} />
-                </TouchableOpacity>
             </View>
 
             <View style={styles.categoriesContainer}>
@@ -186,36 +183,34 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     header: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 15,
         paddingVertical: 15,
     },
     headerTitle: {
-        fontSize: 28,
+        fontSize: 25,
         fontWeight: 'bold',
         color: '#333',
     },
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginHorizontal: 20,
-        marginBottom: 20,
+        backgroundColor: '#FFF',
+        marginHorizontal: 15,
+        marginBottom: 15,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderRadius: 12,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
     },
     searchInput: {
         flex: 1,
-        backgroundColor: '#FFF',
-        paddingHorizontal: 15,
-        paddingVertical: 12,
-        borderRadius: 12,
-        marginRight: 10,
+        marginLeft: 10,
         fontSize: 16,
-        elevation: 2,
         color: '#333',
-    },
-    filterButton: {
-        backgroundColor: '#FF4500',
-        padding: 12,
-        borderRadius: 12,
-        elevation: 2,
     },
     categoriesContainer: {
         marginBottom: 20,

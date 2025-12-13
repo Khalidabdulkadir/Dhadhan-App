@@ -181,6 +181,18 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
+        {/* Categories */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Categories</Text>
+          <FlatList
+            data={categories}
+            renderItem={renderCategory}
+            keyExtractor={(item) => item.id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesList}
+          />
+        </View>
 
         {/* Special Offers - Vertical */}
         {promotions.length > 0 && (
@@ -194,18 +206,7 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Categories */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Categories</Text>
-          <FlatList
-            data={categories}
-            renderItem={renderCategory}
-            keyExtractor={(item) => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesList}
-          />
-        </View>
+        
 
         {/* Featured Promotions */}
         {promotions.length > 0 && (
@@ -314,7 +315,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     borderRadius: 20,
     overflow: 'hidden',
-    height: 160,
+    height: 150,
     position: 'relative',
   },
   bannerImage: {
@@ -326,12 +327,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 20,
+    padding: 10,
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   bannerText: {
     color: '#FFF',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   bannerSubtext: {
@@ -339,11 +340,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   section: {
-    marginBottom: 25,
+    marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     marginLeft: 20,
     marginBottom: 15,
     color: '#333',
