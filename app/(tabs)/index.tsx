@@ -153,15 +153,15 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Welcome to</Text>
             <Text style={styles.restaurantName}>Matrix Restaurant</Text>
           </View>
           <TouchableOpacity style={styles.profileButton} onPress={() => router.push('/(tabs)/profile')}>
             {user ? (
-              <Image
-                source={{ uri: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=500&q=80' }}
-                style={styles.profileImage}
-              />
+              <View style={styles.profileImage}>
+                <Text style={styles.avatarText}>
+                  {user.first_name?.charAt(0)}{user.last_name?.charAt(0)}
+                </Text>
+              </View>
             ) : (
               <View style={[styles.profileImage, styles.guestProfile]}>
                 <User color="#666" size={24} />
@@ -172,9 +172,9 @@ export default function HomeScreen() {
 
         {/* Search Bar */}
         <View style={styles.searchContainer}>
-          <Search color="#666" size={20} />
+          <Search color="#666" size={18} />
           <TextInput
-            placeholder="Find your favorite food..."
+            placeholder="Search food..."
             style={styles.searchInput}
             placeholderTextColor="#999"
             value={searchQuery}
@@ -184,17 +184,7 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* Banner */}
-        <View style={styles.bannerContainer}>
-          <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80' }}
-            style={styles.bannerImage}
-          />
-          <View style={styles.bannerOverlay}>
-            <Text style={styles.bannerText}>Get 20% Discount</Text>
-            <Text style={styles.bannerSubtext}>On your first order</Text>
-          </View>
-        </View>
+
 
         {/* Promotions */}
         {promotions.length > 0 && (
@@ -253,14 +243,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 10,
-    marginBottom: 20,
-  },
-  greeting: {
-    fontSize: 16,
-    color: '#666',
+    marginBottom: 15,
   },
   restaurantName: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#333',
   },
@@ -274,16 +260,24 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+    backgroundColor: '#FF4500',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: '#F5F5F5',
     marginHorizontal: 20,
     paddingHorizontal: 15,
-    paddingVertical: 12,
-    borderRadius: 15,
-    marginBottom: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+    marginBottom: 15,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -412,56 +406,56 @@ const styles = StyleSheet.create({
     color: '#FFB800',
   },
   promotionCard: {
-    width: 200,
-    marginRight: 15,
+    width: 160,
+    marginRight: 12,
     backgroundColor: '#FFF',
-    borderRadius: 15,
+    borderRadius: 12,
     overflow: 'hidden',
-    elevation: 3,
+    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 3,
   },
   promotionImage: {
     width: '100%',
-    height: 140,
+    height: 110,
   },
   discountBadge: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 8,
+    right: 8,
     backgroundColor: '#FF4500',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
   },
   discountText: {
     color: '#FFF',
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 'bold',
   },
   promotionInfo: {
-    padding: 12,
+    padding: 10,
   },
   promotionName: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   promotionPriceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   originalPrice: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#999',
     textDecorationLine: 'line-through',
   },
   promotionPrice: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#FF4500',
   },
