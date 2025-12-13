@@ -204,15 +204,41 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* Popular Items */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Popular Now</Text>
-          {popularItems.map((item) => (
-            <View key={item.id} style={{ marginBottom: 16 }}>
-              {renderPopularItem({ item })}
-            </View>
-          ))}
-        </View>
+        {/* Featured Promotions */}
+        {promotions.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>🎯 Featured Deals</Text>
+            {promotions.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.popularCard}
+                onPress={() => router.push(`/product/${item.id}`)}
+              >
+                <Image source={{ uri: item.image }} style={styles.popularImage} />
+                {item.discount_percentage > 0 && (
+                  <View style={styles.promotionTag}>
+                    <Text style={styles.promotionTagText}>{item.discount_percentage}% OFF</Text>
+                  </View>
+                )}
+                <View style={styles.popularInfo}>
+                  <Text style={styles.popularName}>{item.name}</Text>
+                  <Text style={styles.popularDescription} numberOfLines={2}>{item.description}</Text>
+                  <View style={styles.priceRow}>
+                    <View style={styles.priceColumn}>
+                      {item.discount_percentage > 0 && (
+                        <Text style={styles.originalPriceSmall}>KSh {item.price}</Text>
+                      )}
+                      <Text style={styles.popularPrice}>KSh {item.discounted_price}</Text>
+                    </View>
+                    <View style={styles.ratingContainer}>
+                      <Text style={styles.ratingText}>★ {item.rating}</Text>
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -359,6 +385,21 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 12,
+    position: 'relative',
+  },
+  promotionTag: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: '#FF4500',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  promotionTagText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   popularInfo: {
     flex: 1,
@@ -380,6 +421,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  priceColumn: {
+    flexDirection: 'column',
+  },
+  originalPriceSmall: {
+    fontSize: 12,
+    color: '#999',
+    textDecorationLine: 'line-through',
+    marginBottom: 2,
   },
   popularPrice: {
     fontSize: 16,

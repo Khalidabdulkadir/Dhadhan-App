@@ -91,7 +91,7 @@ export default function ProductDetailsScreen() {
                 </View>
             </ScrollView>
 
-            <View style={[styles.footer, { paddingBottom: Platform.OS === 'ios' ? 40 : 30 }]}>
+            <View style={[styles.footer, { paddingBottom: Platform.OS === 'ios' ? 40 : 90 }]}>
                 <View style={styles.quantityControl}>
                     <TouchableOpacity
                         style={styles.quantityButton}
