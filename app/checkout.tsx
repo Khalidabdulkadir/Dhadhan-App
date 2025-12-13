@@ -165,7 +165,7 @@ export default function CheckoutScreen() {
                 </View>
             </ScrollView>
 
-            <View style={styles.footer}>
+            <View style={[styles.footer, { paddingBottom: Platform.OS === 'ios' ? 20 : 90 }]}>
                 <TouchableOpacity
                     style={[styles.placeOrderButton, loading && styles.buttonDisabled]}
                     onPress={handlePlaceOrder}
@@ -339,7 +339,6 @@ const styles = StyleSheet.create({
         right: 0,
         backgroundColor: '#FFF',
         padding: 20,
-        paddingBottom: Platform.OS === 'ios' ? 20 : 90,
         borderTopWidth: 1,
         borderTopColor: '#F0F0F0',
     },
