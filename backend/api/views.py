@@ -2,14 +2,17 @@
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from django.contrib.auth.models import User
-from .models import Category, Product, Order
+from django.contrib.auth import get_user_model
+from .models import Category, Product, Order, Reel, SavedReel, Restaurant
 from .serializers import (
     CategorySerializer, ProductSerializer, OrderSerializer, 
-    RegisterSerializer, UserSerializer, CreateOrderSerializer
+    RegisterSerializer, UserSerializer, CreateOrderSerializer,
+    ReelSerializer, SavedReelSerializer, RestaurantSerializer
 )
 
 from rest_framework_simplejwt.tokens import RefreshToken
+
+User = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -36,17 +39,29 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (permissions.IsAdminUser,)
 
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class RestaurantViewSet(viewsets.ModelViewSet):
+    queryset = Restaurant.objects.all()
+    serializer_class = RestaurantSerializer
+    permission_classes = (permissions.AllowAny,) # Update based on requirements, potentially IsAdminUser for write operations
+
+class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (permissions.AllowAny,)
 
-class ProductViewSet(viewsets.ReadOnlyModelViewSet):
+    def get_queryset(self):
+        queryset = Category.objects.all()
+        restaurant = self.request.query_params.get('restaurant')
+        if restaurant:
+            queryset = queryset.filter(restaurant_id=restaurant)
+        return queryset
+
+class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = (permissions.AllowAny,)
@@ -54,9 +69,13 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         queryset = Product.objects.all()
         category = self.request.query_params.get('category')
+        restaurant = self.request.query_params.get('restaurant')
         search = self.request.query_params.get('search')
+        
         if category:
             queryset = queryset.filter(category_id=category)
+        if restaurant:
+            queryset = queryset.filter(restaurant_id=restaurant)
         if search:
             queryset = queryset.filter(name__icontains=search)
         return queryset
@@ -78,11 +97,48 @@ class OrderViewSet(viewsets.ModelViewSet):
         read_serializer = OrderSerializer(order)
         return Response(read_serializer.data, status=status.HTTP_201_CREATED)
 
+class ReelViewSet(viewsets.ModelViewSet):
+    queryset = Reel.objects.all().order_by('-created_at')
+    serializer_class = ReelSerializer
+    permission_classes = (permissions.AllowAny,) # Allow viewing by anyone, adjust if needed (e.g., ReadOnly for public)
+
+    def get_parsers(self):
+        if hasattr(self, 'action') and self.action in ['create', 'update', 'partial_update']:
+             from rest_framework.parsers import MultiPartParser, FormParser
+             return [MultiPartParser, FormParser]
+        return super().get_parsers()
+
+    def get_queryset(self):
+        queryset = Reel.objects.all().order_by('-created_at')
+        restaurant = self.request.query_params.get('restaurant')
+        if restaurant:
+             queryset = queryset.filter(restaurant_id=restaurant)
+        return queryset
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.AllowAny]) # Ideally IsAuthenticated
+    def view(self, request, pk=None):
+        reel = self.get_object()
+        reel.views += 1
+        reel.save()
+        return Response({'views': reel.views})
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def toggle_save(self, request, pk=None):
+        reel = self.get_object()
+        user = request.user
+        
+        saved_item, created = SavedReel.objects.get_or_create(user=user, reel=reel)
+        
+        if not created:
+            saved_item.delete()
+            return Response({'status': 'unsaved'})
+        
+        return Response({'status': 'saved'})
+
 import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from django.contrib.auth.models import User
 from .serializers import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 import logging

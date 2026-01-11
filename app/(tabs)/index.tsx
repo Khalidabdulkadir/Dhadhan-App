@@ -1,44 +1,54 @@
-
 import Skeleton from '@/components/Skeleton';
-import api from '@/constants/api';
+import api, { BASE_URL } from '@/constants/api';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useRouter } from 'expo-router';
-import { User } from 'lucide-react-native';
-import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ResizeMode, Video } from 'expo-av';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { Eye, Heart, ShoppingBag } from 'lucide-react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Dimensions, FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function HomeScreen() {
+const { width, height } = Dimensions.get('window');
+
+export default function ReelsScreen() {
   const router = useRouter();
-  const { user, checkAuth } = useAuthStore();
-  const [categories, setCategories] = useState<any[]>([]);
-  const [popularItems, setPopularItems] = useState<any[]>([]);
-  const [promotions, setPromotions] = useState<any[]>([]);
+  const { user } = useAuthStore();
+  const insets = useSafeAreaInsets();
+  const [reels, setReels] = useState<any[]>([]);
+  const [currentReelIndex, setCurrentReelIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [isFocused, setIsFocused] = useState(true);
+  const flatListRef = useRef<FlatList>(null);
+
+  // Refresh reels when screen comes into focus (tab clicked)
+  useFocusEffect(
+    useCallback(() => {
+      setIsFocused(true);
+      setRefreshing(true); // Show pull-to-refresh animation
+      fetchReels(); // Refresh data when user navigates to this tab
+
+      return () => {
+        setIsFocused(false); // Stop videos when navigating away
+      };
+    }, [])
+  );
 
   useEffect(() => {
-    checkAuth();
-    fetchData();
+    fetchReels();
   }, []);
 
-  const fetchData = async () => {
+  const fetchReels = async () => {
     try {
-      const [catRes, prodRes] = await Promise.all([
-        api.get('/categories/'),
-        api.get('/products/')
-      ]);
-      setCategories(catRes.data);
-
-      // Filter promoted products
-      const promotedProducts = prodRes.data.filter((p: any) => p.is_promoted);
-      setPromotions(promotedProducts);
-
-      // For popular items, get non-promoted high-rated products
-      const nonPromoted = prodRes.data.filter((p: any) => !p.is_promoted);
-      setPopularItems(nonPromoted.slice(0, 5));
-    } catch (error) {
-      console.error('Error fetching data:', error);
+      const response = await api.get('/reels/');
+      setReels(response.data);
+    } catch (error: any) {
+      console.error('Error fetching reels:', error);
+      // If 404, it means no reels exist yet - set empty array
+      if (error?.response?.status === 404) {
+        setReels([]);
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -47,465 +57,235 @@ export default function HomeScreen() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchData();
+    fetchReels();
   }, []);
 
-  const renderCategory = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.categoryCard} onPress={() => router.push('/(tabs)/menu')}>
-      <Image source={{ uri: item.image }} style={styles.categoryImage} />
-      <Text style={styles.categoryName}>{item.name}</Text>
-    </TouchableOpacity>
-  );
+  const handleViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: any[] }) => {
+    if (viewableItems.length > 0) {
+      const index = viewableItems[0].index;
+      if (index !== null) {
+        setCurrentReelIndex(index);
+        // Increment view count
+        const reelId = viewableItems[0].item.id;
+        api.post(`/reels/${reelId}/view/`).catch(console.error);
+      }
+    }
+  }).current;
 
-  const renderPopularItem = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.popularCard} onPress={() => router.push(`/product/${item.id}`)}>
-      <Image source={{ uri: item.image }} style={styles.popularImage} />
-      <View style={styles.popularInfo}>
-        <Text style={styles.popularName}>{item.name}</Text>
-        <Text style={styles.popularDescription} numberOfLines={2}>{item.description}</Text>
-        <View style={styles.priceRow}>
-          <Text style={styles.popularPrice}>KSh {item.price}</Text>
-          <View style={styles.ratingContainer}>
-            <Text style={styles.ratingText}>★ {item.rating}</Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+  const handleSave = async (reel: any) => {
+    if (!user) {
+      router.push('/auth/login' as any);
+      return;
+    }
+    try {
+      await api.post(`/reels/${reel.id}/toggle_save/`);
+      // Optimistic update
+      setReels(prev => prev.map(r =>
+        r.id === reel.id ? { ...r, is_saved: !r.is_saved } : r
+      ));
+    } catch (error) {
+      console.error('Error saving reel:', error);
+    }
+  };
 
-  const renderPromotion = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.popularCard} onPress={() => router.push(`/product/${item.id}`)}>
-      <Image source={{ uri: item.image }} style={styles.popularImage} />
-      {item.discount_percentage > 0 && (
-        <View style={styles.promotionTag}>
-          <Text style={styles.promotionTagText}>{item.discount_percentage}% OFF</Text>
-        </View>
-      )}
-      <View style={styles.popularInfo}>
-        <Text style={styles.popularName}>{item.name}</Text>
-        <Text style={styles.popularDescription} numberOfLines={2}>{item.description}</Text>
-        <View style={styles.priceRow}>
-          <View style={styles.priceColumn}>
-            {item.discount_percentage > 0 && (
-              <Text style={styles.originalPriceSmall}>KSh {item.price}</Text>
-            )}
-            <Text style={styles.popularPrice}>KSh {item.discounted_price}</Text>
-          </View>
-          <View style={styles.ratingContainer}>
-            <Text style={styles.ratingText}>★ {item.rating}</Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+  const getImageUrl = (url: string) => {
+    if (!url) return 'https://via.placeholder.com/150';
+    if (url.startsWith('http')) return url;
+    return `${BASE_URL}${url}`;
+  };
 
-  const renderSkeleton = () => (
-    <View style={{ padding: 20 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
-        <View>
-          <Skeleton width={100} height={20} style={{ marginBottom: 5 }} />
-          <Skeleton width={150} height={30} />
-        </View>
-        <Skeleton width={40} height={40} style={{ borderRadius: 20 }} />
-      </View>
-      <Skeleton width="100%" height={50} style={{ borderRadius: 15, marginBottom: 20 }} />
-      <Skeleton width="100%" height={160} style={{ borderRadius: 20, marginBottom: 25 }} />
-      <Skeleton width={120} height={25} style={{ marginBottom: 15 }} />
-      <View style={{ flexDirection: 'row', marginBottom: 25 }}>
-        {[1, 2, 3, 4].map(i => (
-          <View key={i} style={{ marginRight: 15, alignItems: 'center' }}>
-            <Skeleton width={50} height={50} style={{ borderRadius: 25, marginBottom: 8 }} />
-            <Skeleton width={60} height={15} />
+  const renderItem = useCallback(({ item, index }: { item: any; index: number }) => {
+    const isActive = index === currentReelIndex;
+
+    return (
+      <View style={{ width, height }}>
+        <Video
+          source={{ uri: getImageUrl(item.video) }}
+          style={StyleSheet.absoluteFill}
+          resizeMode={ResizeMode.COVER}
+          isLooping
+          shouldPlay={isActive && isFocused}
+          isMuted={false}
+        />
+
+        {/* Gradient Overlay */}
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.8)']}
+          style={styles.gradient}
+        />
+
+        {/* Right Side Actions - TikTok Style */}
+        <View style={[styles.rightActions, { bottom: 150 }]}>
+          <View style={styles.actionButton}>
+            <Eye color="#FFF" size={28} />
+            <Text style={styles.actionText}>{item.views}</Text>
           </View>
-        ))}
-      </View>
-      <Skeleton width={150} height={25} style={{ marginBottom: 15 }} />
-      {[1, 2, 3].map(i => (
-        <View key={i} style={{ flexDirection: 'row', marginBottom: 15 }}>
-          <Skeleton width={100} height={100} style={{ borderRadius: 12, marginRight: 15 }} />
-          <View style={{ flex: 1, justifyContent: 'center' }}>
-            <Skeleton width="80%" height={20} style={{ marginBottom: 8 }} />
-            <Skeleton width="100%" height={15} style={{ marginBottom: 8 }} />
-            <Skeleton width={60} height={20} />
-          </View>
+          <TouchableOpacity style={styles.actionButton} onPress={() => handleSave(item)}>
+            <Heart
+              color={item.is_saved ? '#FF4500' : '#FFF'}
+              size={28}
+              fill={item.is_saved ? '#FF4500' : 'transparent'}
+            />
+            <Text style={styles.actionText}>{item.is_saved ? 'Saved' : 'Save'}</Text>
+          </TouchableOpacity>
         </View>
-      ))}
-    </View>
-  );
+
+        {/* Bottom Info */}
+        <View style={[styles.bottomInfo, { paddingBottom: 100 }]}>
+          <Text style={styles.caption}>{item.caption}</Text>
+
+          {/* Product Card */}
+          {item.product_details && (
+            <View style={styles.productCard}>
+              <Image
+                source={{ uri: getImageUrl(item.product_details.image) }}
+                style={styles.productImage}
+              />
+              <View style={styles.productInfo}>
+                <Text style={styles.productName} numberOfLines={1}>{item.product_details.name}</Text>
+                <Text style={styles.productPrice}>KSh {item.product_details.price}</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.orderButton}
+                onPress={() => router.push(`/product/${item.product}` as any)}
+              >
+                <Text style={styles.orderButtonText}>Order from {item.restaurant_data?.name || 'Restaurant'}</Text>
+                <ShoppingBag size={16} color="#FFF" style={{ marginLeft: 4 }} />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  }, [currentReelIndex, isFocused, getImageUrl]);
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        {renderSkeleton()}
-      </SafeAreaView>
+      <View style={[styles.container, { paddingTop: insets.top, paddingHorizontal: 20 }]}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Skeleton width={width} height={height} />
+          <View style={{ position: 'absolute', bottom: 100, left: 20, right: 20 }}>
+            <Skeleton width={200} height={20} style={{ marginBottom: 15 }} />
+            <Skeleton width="100%" height={80} style={{ borderRadius: 15 }} />
+          </View>
+        </View>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView
+    <View style={styles.container}>
+      <FlatList
+        ref={flatListRef}
+        data={reels}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        pagingEnabled
         showsVerticalScrollIndicator={false}
+        snapToInterval={height}
+        snapToAlignment="start"
+        decelerationRate="fast"
+        onViewableItemsChanged={handleViewableItemsChanged}
+        viewabilityConfig={{
+          itemVisiblePercentThreshold: 50
+        }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF4500']} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#FFF"
+            title="Pull to refresh"
+            titleColor="#FFF"
+          />
         }
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.restaurantName}>Matrix Restaurant</Text>
-          </View>
-          <TouchableOpacity style={styles.profileButton} onPress={() => router.push('/(tabs)/profile')}>
-            {user ? (
-              <View style={styles.profileImage}>
-                <Text style={styles.avatarText}>
-                  {user.first_name?.charAt(0)}{user.last_name?.charAt(0)}
-                </Text>
-              </View>
-            ) : (
-              <View style={[styles.profileImage, styles.guestProfile]}>
-                <User color="#666" size={24} />
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        {/* Banner - Click to view menu */}
-        <TouchableOpacity style={styles.bannerContainer} onPress={() => router.push('/(tabs)/menu')}>
-          <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80' }}
-            style={styles.bannerImage}
-          />
-          <View style={styles.bannerOverlay}>
-            <Text style={styles.bannerText}>Get 20% Discount</Text>
-            <Text style={styles.bannerSubtext}>On your first order</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* Categories */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Categories</Text>
-          <FlatList
-            data={categories}
-            renderItem={renderCategory}
-            keyExtractor={(item) => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesList}
-          />
-        </View>
-
-        {/* Special Offers - Vertical */}
-        {promotions.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🔥 Special Offers</Text>
-            {promotions.map((item) => (
-              <View key={item.id} style={{ marginBottom: 16 }}>
-                {renderPromotion({ item })}
-              </View>
-            ))}
-          </View>
-        )}
-
-        
-
-        {/* Featured Promotions */}
-        {promotions.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🎯 Featured Deals</Text>
-            {promotions.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.popularCard}
-                onPress={() => router.push(`/product/${item.id}`)}
-              >
-                <Image source={{ uri: item.image }} style={styles.popularImage} />
-                {item.discount_percentage > 0 && (
-                  <View style={styles.promotionTag}>
-                    <Text style={styles.promotionTagText}>{item.discount_percentage}% OFF</Text>
-                  </View>
-                )}
-                <View style={styles.popularInfo}>
-                  <Text style={styles.popularName}>{item.name}</Text>
-                  <Text style={styles.popularDescription} numberOfLines={2}>{item.description}</Text>
-                  <View style={styles.priceRow}>
-                    <View style={styles.priceColumn}>
-                      {item.discount_percentage > 0 && (
-                        <Text style={styles.originalPriceSmall}>KSh {item.price}</Text>
-                      )}
-                      <Text style={styles.popularPrice}>KSh {item.discounted_price}</Text>
-                    </View>
-                    <View style={styles.ratingContainer}>
-                      <Text style={styles.ratingText}>★ {item.rating}</Text>
-                    </View>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#000',
   },
-  center: {
-    justifyContent: 'center',
+  gradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '50%',
+  },
+  rightActions: {
+    position: 'absolute',
+    right: 15,
     alignItems: 'center',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  actionButton: {
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    marginBottom: 15,
-  },
-  restaurantName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  profileButton: {
-    padding: 4,
-    backgroundColor: '#FFF',
-    borderRadius: 25,
-    elevation: 2,
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#FF4500',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    marginHorizontal: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 12,
-    marginBottom: 15,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#333',
-  },
-  bannerContainer: {
-    marginHorizontal: 20,
     marginBottom: 25,
-    borderRadius: 20,
-    overflow: 'hidden',
-    height: 150,
-    position: 'relative',
   },
-  bannerImage: {
-    width: '100%',
-    height: '100%',
+  actionText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 5,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10
   },
-  bannerOverlay: {
+  bottomInfo: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 10,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
-  bannerText: {
-    color: '#FFF',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  bannerSubtext: {
-    color: '#FFF',
-    fontSize: 14,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginLeft: 20,
-    marginBottom: 15,
-    color: '#333',
-  },
-  categoriesList: {
     paddingHorizontal: 20,
   },
-  categoryCard: {
-    marginRight: 15,
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    padding: 10,
-    borderRadius: 15,
-    elevation: 2,
-    width: 80,
+  caption: {
+    color: '#FFF',
+    fontSize: 16,
+    marginBottom: 20,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10
   },
-  categoryImage: {
+  productCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 15,
+    padding: 10,
+    marginBottom: 10,
+  },
+  productImage: {
     width: 50,
     height: 50,
-    borderRadius: 25,
-    marginBottom: 8,
+    borderRadius: 10,
   },
-  categoryName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-  },
-  popularCard: {
-    flexDirection: 'row',
-    backgroundColor: '#FFF',
-    marginHorizontal: 20,
-    borderRadius: 15,
-    padding: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-  },
-  popularImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 12,
-    position: 'relative',
-  },
-  promotionTag: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: '#FF4500',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  promotionTagText: {
-    color: '#FFF',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  popularInfo: {
+  productInfo: {
     flex: 1,
-    marginLeft: 15,
-    justifyContent: 'center',
+    marginLeft: 10,
   },
-  popularName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  popularDescription: {
-    fontSize: 12,
-    color: '#888',
-    marginBottom: 8,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  priceColumn: {
-    flexDirection: 'column',
-  },
-  originalPriceSmall: {
-    fontSize: 12,
-    color: '#999',
-    textDecorationLine: 'line-through',
-    marginBottom: 2,
-  },
-  popularPrice: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FF4500',
-  },
-  ratingContainer: {
-    backgroundColor: '#FFF9E6',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  ratingText: {
-    color: '#FFB800',
-  },
-  promotionCard: {
-    width: 160,
-    marginRight: 12,
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-  },
-  promotionImage: {
-    width: '100%',
-    height: 110,
-  },
-  discountBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#FF4500',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  discountText: {
-    color: '#FFF',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  promotionInfo: {
-    padding: 10,
-  },
-  promotionName: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  promotionPriceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  originalPrice: {
-    fontSize: 11,
-    color: '#999',
-    textDecorationLine: 'line-through',
-  },
-  promotionPrice: {
+  productName: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#FF4500',
+    color: '#333',
   },
-  guestProfile: {
-    backgroundColor: '#E0E0E0',
-    justifyContent: 'center',
+  productPrice: {
+    fontSize: 14,
+    color: '#FF4500',
+    fontWeight: 'bold',
+  },
+  orderButton: {
+    flexDirection: 'row',
+    backgroundColor: '#FF4500',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 25,
     alignItems: 'center',
+  },
+  orderButtonText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });

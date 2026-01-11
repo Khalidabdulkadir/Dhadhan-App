@@ -1,15 +1,17 @@
 
-import api from '@/constants/api';
+import api, { BASE_URL } from '@/constants/api';
 import { useCartStore } from '@/store/useCartStore';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Minus, Plus, Star } from 'lucide-react-native';
+import { ArrowLeft, Clock, Flame, Minus, Plus, ShoppingCart, Star } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ProductDetailsScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
     const addItem = useCartStore((state) => state.addItem);
+    const insets = useSafeAreaInsets();
 
     const [product, setProduct] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -32,6 +34,12 @@ export default function ProductDetailsScreen() {
         }
     };
 
+    const getImageUrl = (url: string) => {
+        if (!url) return 'https://via.placeholder.com/300';
+        if (url.startsWith('http')) return url;
+        return `${BASE_URL}${url}`;
+    };
+
     if (loading) {
         return (
             <View style={[styles.container, styles.center]}>
@@ -49,7 +57,6 @@ export default function ProductDetailsScreen() {
     }
 
     const handleAddToCart = () => {
-        // We need to convert price to number if it's string from API
         const productToAdd = {
             ...product,
             price: Number(product.price)
@@ -61,55 +68,94 @@ export default function ProductDetailsScreen() {
         router.push('/(tabs)/cart');
     };
 
+    const finalPrice = product.is_promoted ? product.discounted_price : product.price;
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
             <Stack.Screen options={{ headerShown: false }} />
-            <ScrollView contentContainerStyle={{ paddingBottom: Platform.OS === 'ios' ? 180 : 160 }}>
+
+            {/* Back Button */}
+            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                <ArrowLeft color="#111" size={24} />
+            </TouchableOpacity>
+
+            <ScrollView
+                contentContainerStyle={{ paddingBottom: 120 }}
+                showsVerticalScrollIndicator={false}
+            >
+                {/* Product Image */}
                 <View style={styles.imageContainer}>
-                    <Image source={{ uri: product.image }} style={styles.image} />
-                    <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                        <ArrowLeft color="#333" size={24} />
-                    </TouchableOpacity>
+                    <Image source={{ uri: getImageUrl(product.image) }} style={styles.image} />
+                    {product.is_promoted && (
+                        <View style={styles.badge}>
+                            <Text style={styles.badgeText}>{product.discount_percentage}% OFF</Text>
+                        </View>
+                    )}
                 </View>
 
+                {/* Content */}
                 <View style={styles.content}>
-                    <View style={styles.headerRow}>
-                        <Text style={styles.name}>{product.name}</Text>
-                        <View style={styles.ratingBadge}>
-                            <Star fill="#FFB800" stroke="#FFB800" size={16} />
-                            <Text style={styles.ratingText}>{product.rating}</Text>
+                    {/* Product Name */}
+                    <Text style={styles.name}>{product.name}</Text>
+
+                    {/* Meta Info */}
+                    <View style={styles.metaRow}>
+                        <View style={styles.metaItem}>
+                            <Star fill="#FFB800" stroke="#FFB800" size={18} />
+                            <Text style={styles.metaText}>{product.rating}</Text>
+                        </View>
+                        {product.calories > 0 && (
+                            <View style={styles.metaItem}>
+                                <Flame fill="#FF4500" stroke="#FF4500" size={18} />
+                                <Text style={styles.metaText}>{product.calories} cal</Text>
+                            </View>
+                        )}
+                        <View style={styles.metaItem}>
+                            <Clock color="#666" size={18} />
+                            <Text style={styles.metaText}>20-30 min</Text>
                         </View>
                     </View>
 
-                    <Text style={styles.price}>KSh {Number(product.price).toFixed(2)}</Text>
+                    {/* Price */}
+                    <View style={styles.priceContainer}>
+                        <View>
+                            <Text style={styles.price}>KSh {Number(finalPrice).toFixed(2)}</Text>
+                            {product.is_promoted && (
+                                <Text style={styles.oldPrice}>KSh {Number(product.price).toFixed(2)}</Text>
+                            )}
+                        </View>
 
-                    <Text style={styles.sectionTitle}>Description</Text>
-                    <Text style={styles.description}>{product.description}</Text>
+                        {/* Quantity Control - Moved to top right */}
+                        <View style={styles.quantityControl}>
+                            <TouchableOpacity
+                                style={styles.quantityButton}
+                                onPress={() => setQuantity(Math.max(1, quantity - 1))}
+                            >
+                                <Minus color="#111" size={20} />
+                            </TouchableOpacity>
+                            <Text style={styles.quantityText}>{quantity}</Text>
+                            <TouchableOpacity
+                                style={styles.quantityButton}
+                                onPress={() => setQuantity(quantity + 1)}
+                            >
+                                <Plus color="#111" size={20} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
 
-                    <Text style={styles.sectionTitle}>Calories</Text>
-                    <Text style={styles.calories}>{product.calories} cal</Text>
+                    {/* Description */}
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>About this item</Text>
+                        <Text style={styles.description}>{product.description}</Text>
+                    </View>
                 </View>
             </ScrollView>
 
-            <View style={[styles.footer, { paddingBottom: Platform.OS === 'ios' ? 40 : 90 }]}>
-                <View style={styles.quantityControl}>
-                    <TouchableOpacity
-                        style={styles.quantityButton}
-                        onPress={() => setQuantity(Math.max(1, quantity - 1))}
-                    >
-                        <Minus color="#333" size={20} />
-                    </TouchableOpacity>
-                    <Text style={styles.quantityText}>{quantity}</Text>
-                    <TouchableOpacity
-                        style={styles.quantityButton}
-                        onPress={() => setQuantity(quantity + 1)}
-                    >
-                        <Plus color="#333" size={20} />
-                    </TouchableOpacity>
-                </View>
-
+            {/* Sticky Add to Cart Button */}
+            <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
                 <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
-                    <Text style={styles.addToCartText}>Add to Cart - KSh {(Number(product.price) * quantity).toFixed(2)}</Text>
+                    <ShoppingCart color="#FFF" size={20} />
+                    <Text style={styles.addToCartText}>Add to Cart - KSh {(Number(finalPrice) * quantity).toFixed(2)}</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -119,83 +165,154 @@ export default function ProductDetailsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFF',
+        backgroundColor: '#000', // Bg for image area
     },
     center: {
         justifyContent: 'center',
         alignItems: 'center',
     },
-    imageContainer: {
-        height: 300,
-        width: '100%',
-        position: 'relative',
-    },
-    image: {
-        width: '100%',
-        height: '100%',
-    },
     backButton: {
         position: 'absolute',
         top: 50,
         left: 20,
+        zIndex: 100,
         backgroundColor: '#FFF',
-        padding: 10,
-        borderRadius: 25,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+    },
+    imageContainer: {
+        height: 400, // Taller immersive image
+        width: '100%',
+        position: 'relative',
+        backgroundColor: '#F3F4F6',
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
+    },
+    badge: {
+        position: 'absolute',
+        bottom: 50, // Move badge up so it's not hidden by sheet
+        right: 20,
+        backgroundColor: '#FFDA45', // Glovo yellow
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        borderRadius: 20,
+        zIndex: 10,
         elevation: 5,
     },
-    content: {
-        padding: 20,
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        backgroundColor: '#FFF',
-        marginTop: -30,
+    badgeText: {
+        color: '#111',
+        fontSize: 13,
+        fontWeight: '800',
     },
-    headerRow: {
+    content: {
+        backgroundColor: '#FFF',
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        marginTop: -50, // Deeper overlap
+        paddingHorizontal: 25,
+        paddingTop: 35,
+        paddingBottom: 120, // Bottom padding for scrolling
+        minHeight: 500, // Ensure it fills
+    },
+    name: {
+        fontSize: 28,
+        fontWeight: '800',
+        color: '#111',
+        marginBottom: 15,
+        lineHeight: 34,
+    },
+    metaRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 15,
+        marginBottom: 25,
+        backgroundColor: '#F9FAFB',
+        padding: 12,
+        borderRadius: 16,
+        alignSelf: 'flex-start',
+    },
+    metaItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    metaText: {
+        color: '#374151',
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    priceContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 10,
-    },
-    name: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#333',
-        flex: 1,
-    },
-    ratingBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FFF9E6',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 15,
-    },
-    ratingText: {
-        marginLeft: 5,
-        fontWeight: 'bold',
-        color: '#333',
+        marginBottom: 30,
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F3F4F6',
     },
     price: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#FF4500',
+        fontSize: 32,
+        fontWeight: '800',
+        color: '#111',
+    },
+    oldPrice: {
+        fontSize: 16,
+        color: '#9CA3AF',
+        textDecorationLine: 'line-through',
+        marginTop: 4,
+        fontWeight: '500',
+    },
+    quantityControl: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F3F4F6',
+        borderRadius: 30,
+        padding: 5,
+    },
+    quantityButton: {
+        width: 40,
+        height: 40, // Bigger touch targets
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#FFF',
+        borderRadius: 20,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+    },
+    quantityText: {
+        fontSize: 18,
+        fontWeight: '700',
+        marginHorizontal: 15,
+        color: '#111',
+        minWidth: 20,
+        textAlign: 'center',
+    },
+    section: {
         marginBottom: 20,
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
+        fontWeight: '700',
+        color: '#111',
         marginBottom: 10,
-        marginTop: 10,
     },
     description: {
         fontSize: 16,
-        color: '#666',
+        color: '#4B5563',
         lineHeight: 24,
-    },
-    calories: {
-        fontSize: 16,
-        color: '#888',
     },
     footer: {
         position: 'absolute',
@@ -203,46 +320,24 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         backgroundColor: '#FFF',
-        padding: 20,
-        paddingBottom: 30,
-        flexDirection: 'row',
-        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingTop: 15,
         borderTopWidth: 1,
-        borderTopColor: '#F0F0F0',
-        elevation: 10,
-    },
-    quantityControl: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F5F5F5',
-        borderRadius: 25,
-        padding: 5,
-        marginRight: 20,
-    },
-    quantityButton: {
-        width: 40,
-        height: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#FFF',
-        borderRadius: 20,
-        elevation: 1,
-    },
-    quantityText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginHorizontal: 15,
+        borderTopColor: '#F3F4F6',
+        elevation: 20,
     },
     addToCartButton: {
-        flex: 1,
-        backgroundColor: '#FF4500',
-        paddingVertical: 15,
-        borderRadius: 25,
+        flexDirection: 'row',
+        backgroundColor: '#111', // Bold Black button
+        paddingVertical: 18,
+        borderRadius: 30,
         alignItems: 'center',
+        justifyContent: 'center',
+        gap: 12,
     },
     addToCartText: {
         color: '#FFF',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: '800',
     },
 });

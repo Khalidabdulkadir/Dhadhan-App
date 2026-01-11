@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Orders from './pages/Orders';
 import Products from './pages/Products';
+import Reels from './pages/Reels';
+import Restaurants from './pages/Restaurants';
 import Users from './pages/Users';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -38,10 +40,26 @@ function App() {
           }
         />
         <Route
+          path="/restaurants"
+          element={
+            <ProtectedRoute>
+              <Restaurants />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/products"
           element={
             <ProtectedRoute>
               <Products />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reels"
+          element={
+            <ProtectedRoute>
+              <Reels />
             </ProtectedRoute>
           }
         />

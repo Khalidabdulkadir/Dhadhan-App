@@ -10,6 +10,9 @@ urlpatterns = [
     # Redirect /admin to /admin/ to prevent React from capturing it
     path('admin', RedirectView.as_view(url='/admin/', permanent=True)),
     path('api/', include('api.urls')),
-    # Match all other routes to index.html for SPA
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Catch-all must be last
+urlpatterns += [
+    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
+]

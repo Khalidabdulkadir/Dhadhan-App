@@ -1,15 +1,17 @@
 
 import Skeleton from '@/components/Skeleton';
-import api from '@/constants/api';
+import api, { BASE_URL } from '@/constants/api';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Search } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Image, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FlatList, Image, Platform, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function MenuScreen() {
     const router = useRouter();
     const { q } = useLocalSearchParams();
+    const insets = useSafeAreaInsets();
     const [categories, setCategories] = useState<any[]>([]);
     const [products, setProducts] = useState<any[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all');
@@ -60,6 +62,7 @@ export default function MenuScreen() {
                 selectedCategory === item.id && styles.activeCategoryChip
             ]}
             onPress={() => setSelectedCategory(item.id)}
+            activeOpacity={0.7}
         >
             <Text style={[
                 styles.categoryChipText,
@@ -68,76 +71,96 @@ export default function MenuScreen() {
         </TouchableOpacity>
     );
 
+    const getImageUrl = (url: string) => {
+        if (!url) return 'https://via.placeholder.com/300';
+        if (url.startsWith('http')) return url;
+        return `${BASE_URL}${url}`;
+    };
 
     const renderItem = ({ item }: { item: any }) => (
-        <TouchableOpacity style={styles.gridItem} onPress={() => router.push(`/product/${item.id}` as any)}>
-            <Image source={{ uri: item.image }} style={styles.gridImage} />
-            {item.is_promoted && item.discount_percentage > 0 && (
-                <View style={styles.discountBadge}>
-                    <Text style={styles.discountText}>{item.discount_percentage}% OFF</Text>
+        <TouchableOpacity
+            style={styles.card}
+            onPress={() => router.push(`/product/${item.id}` as any)}
+            activeOpacity={0.9}
+        >
+            <View style={styles.imageContainer}>
+                <Image source={{ uri: getImageUrl(item.image) }} style={styles.cardImage} resizeMode="cover" />
+                {item.is_promoted && item.discount_percentage > 0 && (
+                    <View style={styles.badge}>
+                        <Text style={styles.badgeText}>{item.discount_percentage}% OFF</Text>
+                    </View>
+                )}
+            </View>
+
+            <View style={styles.cardContent}>
+                <View style={styles.cardHeader}>
+                    <Text style={styles.cardTitle} numberOfLines={1}>{item.name}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        {item.is_promoted && item.discount_percentage > 0 ? (
+                            <Text style={{ color: '#FF4500', fontWeight: 'bold' }}>KSh {item.discounted_price}</Text>
+                        ) : (
+                            <Text style={styles.cardPrice}>KSh {item.price}</Text>
+                        )}
+                        {item.is_promoted && item.discount_percentage > 0 && (
+                            <Text style={styles.oldPrice}>KSh {item.price}</Text>
+                        )}
+                    </View>
                 </View>
-            )}
-            <View style={styles.gridInfo}>
-                <Text style={styles.gridName} numberOfLines={1}>{item.name}</Text>
-                <Text style={styles.gridDesc} numberOfLines={2}>{item.description}</Text>
-                <View style={styles.gridPriceRow}>
-                    {item.is_promoted && item.discount_percentage > 0 ? (
-                        <View>
-                            <Text style={styles.gridOriginalPrice}>KSh {item.price}</Text>
-                            <Text style={styles.gridPrice}>KSh {item.discounted_price}</Text>
-                        </View>
-                    ) : (
-                        <Text style={styles.gridPrice}>KSh {item.price}</Text>
-                    )}
-                </View>
+
+                {item.restaurant_data && (
+                    <View style={styles.restaurantContainer}>
+                        <Text style={styles.restaurantName} numberOfLines={1}>
+                            By {item.restaurant_data.name}
+                        </Text>
+                    </View>
+                )}
             </View>
         </TouchableOpacity>
     );
 
     const renderSkeleton = () => (
         <View style={{ padding: 20 }}>
-            <Skeleton width={150} height={30} style={{ marginBottom: 20 }} />
-            <Skeleton width="100%" height={50} style={{ borderRadius: 12, marginBottom: 20 }} />
-            <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+            <Skeleton width={150} height={40} style={{ marginBottom: 25, borderRadius: 8 }} />
+            <Skeleton width="100%" height={56} style={{ borderRadius: 16, marginBottom: 30 }} />
+            <View style={{ flexDirection: 'row', marginBottom: 30 }}>
                 {[1, 2, 3, 4].map(i => (
-                    <Skeleton key={i} width={80} height={35} style={{ borderRadius: 20, marginRight: 10 }} />
+                    <Skeleton key={i} width={100} height={40} style={{ borderRadius: 25, marginRight: 12 }} />
                 ))}
             </View>
-            {[1, 2, 3, 4].map(i => (
-                <View key={i} style={{ flexDirection: 'row', marginBottom: 15 }}>
-                    <Skeleton width={80} height={80} style={{ borderRadius: 12, marginRight: 15 }} />
-                    <View style={{ flex: 1, justifyContent: 'center' }}>
-                        <Skeleton width="60%" height={20} style={{ marginBottom: 8 }} />
-                        <Skeleton width="90%" height={15} style={{ marginBottom: 8 }} />
-                        <Skeleton width={50} height={20} />
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                {[1, 2, 3, 4].map(i => (
+                    <View key={i} style={{ width: '48%', marginBottom: 20 }}>
+                        <Skeleton width="100%" height={160} style={{ borderRadius: 20, marginBottom: 12 }} />
+                        <Skeleton width="80%" height={20} style={{ marginBottom: 8 }} />
+                        <Skeleton width="50%" height={20} />
                     </View>
-                </View>
-            ))}
+                ))}
+            </View>
         </View>
     );
 
     if (loading) {
         return (
-            <SafeAreaView style={styles.container}>
+            <View style={[styles.container, { paddingTop: insets.top }]}>
                 {renderSkeleton()}
-            </SafeAreaView>
+            </View>
         );
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Our Menu</Text>
             </View>
 
             <View style={styles.searchContainer}>
-                <Search color="#666" size={18} />
+                <Search color="#1F2937" size={20} />
                 <TextInput
-                    placeholder="Search food..."
+                    placeholder="What are you craving?"
                     style={styles.searchInput}
                     value={searchQuery}
                     onChangeText={setSearchQuery}
-                    placeholderTextColor="#999"
+                    placeholderTextColor="#9CA3AF"
                 />
             </View>
 
@@ -158,7 +181,7 @@ export default function MenuScreen() {
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
                 columnWrapperStyle={styles.row}
-                contentContainerStyle={styles.menuList}
+                contentContainerStyle={[styles.menuList, { paddingBottom: 40 }]}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF4500']} />
@@ -169,199 +192,157 @@ export default function MenuScreen() {
                     </View>
                 }
             />
-        </SafeAreaView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F8F9FA',
-    },
-    center: {
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: '#FAFAFA',
     },
     header: {
-        paddingHorizontal: 15,
-        paddingVertical: 15,
+        paddingHorizontal: 16,
+        paddingTop: 5,
+        paddingBottom: 10,
     },
     headerTitle: {
-        fontSize: 25,
-        fontWeight: 'bold',
-        color: '#333',
+        fontSize: 24,
+        fontWeight: '800',
+        color: '#111827',
+        letterSpacing: -0.5,
     },
+    // Compact Search Styles
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFF',
-        marginHorizontal: 15,
-        marginBottom: 15,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderRadius: 12,
-        elevation: 2,
+        backgroundColor: '#FFFFFF',
+        marginHorizontal: 16,
+        marginBottom: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 25,
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
+        shadowOpacity: 0.03,
+        shadowRadius: 3,
+        elevation: 1,
     },
     searchInput: {
         flex: 1,
-        marginLeft: 10,
-        fontSize: 16,
-        color: '#333',
+        marginLeft: 8,
+        fontSize: 13,
+        color: '#1F2937',
+        fontWeight: '500',
+        fontFamily: Platform.select({ ios: 'System', android: 'Roboto' }),
     },
+    // Categories
     categoriesContainer: {
-        marginBottom: 20,
+        marginBottom: 12,
     },
     categoriesList: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
     },
     categoryChip: {
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        backgroundColor: '#FFF',
-        borderRadius: 25,
-        marginRight: 10,
-        borderWidth: 1,
-        borderColor: '#EEE',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        backgroundColor: '#F3F4F6',
+        borderRadius: 20,
+        marginRight: 8,
     },
     activeCategoryChip: {
-        backgroundColor: '#FF4500',
-        borderColor: '#FF4500',
+        backgroundColor: '#111827',
+        transform: [{ scale: 1.02 }],
     },
     categoryChipText: {
         fontWeight: '600',
-        color: '#666',
+        color: '#4B5563',
+        fontSize: 13,
     },
     activeCategoryChipText: {
-        color: '#FFF',
+        color: '#FFFFFF',
     },
     menuList: {
-        paddingHorizontal: 10,
+        paddingHorizontal: 12,
         paddingBottom: 20,
     },
     row: {
         justifyContent: 'space-between',
-        paddingHorizontal: 10,
+        paddingHorizontal: 2,
     },
-    gridItem: {
-        width: '48%',
-        backgroundColor: '#FFF',
-        borderRadius: 12,
-        marginBottom: 15,
-        overflow: 'hidden',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
+    card: {
+        width: '49%',
+        marginBottom: 16,
+        // Removed shadows, borders, background
     },
-    gridImage: {
+    imageContainer: {
         width: '100%',
-        height: 140,
+        height: 110,
+        borderRadius: 8, // Small radius
+        overflow: 'hidden',
+        position: 'relative',
+        backgroundColor: '#F0F0F0', // Slight placeholder color
     },
-    discountBadge: {
+    cardImage: {
+        width: '100%',
+        height: '100%',
+    },
+    badge: {
         position: 'absolute',
-        top: 8,
-        right: 8,
+        top: 6,
+        left: 6,
         backgroundColor: '#FF4500',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
+        paddingHorizontal: 6,
+        paddingVertical: 3,
+        borderRadius: 4,
     },
-    discountText: {
+    badgeText: {
         color: '#FFF',
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: 'bold',
+        textTransform: 'uppercase',
     },
-    gridInfo: {
-        padding: 12,
+    cardContent: {
+        paddingTop: 8, // Only top padding needed
+        paddingHorizontal: 0,
     },
-    gridName: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 4,
-    },
-    gridDesc: {
-        fontSize: 11,
-        color: '#888',
-        marginBottom: 8,
-    },
-    gridPriceRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    gridOriginalPrice: {
-        fontSize: 11,
-        color: '#999',
-        textDecorationLine: 'line-through',
+    cardHeader: {
         marginBottom: 2,
     },
-    gridPrice: {
-        fontSize: 15,
-        fontWeight: 'bold',
-        color: '#FF4500',
+    cardTitle: {
+        fontSize: 13,
+        fontWeight: '400', // Not bold
+        color: '#1F2937',
+        marginBottom: 2,
     },
-    menuItem: {
-        flexDirection: 'row',
-        backgroundColor: '#FFF',
-        borderRadius: 15,
-        padding: 12,
-        marginBottom: 15,
-        alignItems: 'center',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 5,
+    cardPrice: {
+        fontSize: 13,
+        fontWeight: '700', // Price bold
+        color: '#111827',
     },
-    itemImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 12,
+    oldPrice: {
+        fontSize: 11,
+        color: '#9CA3AF',
+        textDecorationLine: 'line-through',
+        marginLeft: 6,
     },
-    itemInfo: {
-        flex: 1,
-        marginLeft: 15,
+    restaurantContainer: {
+        marginTop: 2,
     },
-    itemName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 4,
-    },
-    itemDesc: {
-        fontSize: 12,
-        color: '#888',
-        marginBottom: 8,
-    },
-    itemPrice: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#FF4500',
-    },
-    addButton: {
-        width: 35,
-        height: 35,
-        backgroundColor: '#FFF0EB',
-        borderRadius: 17.5,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    addButtonText: {
-        fontSize: 20,
-        color: '#FF4500',
-        fontWeight: 'bold',
+    restaurantName: {
+        fontSize: 10,
+        color: '#6B7280',
+        fontWeight: '400',
     },
     emptyState: {
         alignItems: 'center',
-        marginTop: 50,
+        marginTop: 40,
     },
     emptyText: {
-        color: '#999',
-        fontSize: 16,
+        color: '#9CA3AF',
+        fontSize: 14,
+        fontWeight: '500',
     },
 });

@@ -1,6 +1,7 @@
-import api from '@/constants/api';
+
+import api, { BASE_URL } from '@/constants/api';
 import { useRouter } from 'expo-router';
-import { Search as SearchIcon, X } from 'lucide-react-native';
+import { Search as SearchIcon, TrendingUp, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -24,6 +25,12 @@ export default function SearchScreen() {
         } catch (error) {
             console.error('Error fetching promotions:', error);
         }
+    };
+
+    const getImageUrl = (url: string) => {
+        if (!url) return 'https://via.placeholder.com/150';
+        if (url.startsWith('http')) return url;
+        return `${BASE_URL}${url}`;
     };
 
     const handleSearch = async () => {
@@ -54,7 +61,7 @@ export default function SearchScreen() {
 
     const renderPromotion = ({ item }: { item: any }) => (
         <TouchableOpacity style={styles.promotionCard} onPress={() => router.push(`/product/${item.id}`)}>
-            <Image source={{ uri: item.image }} style={styles.promotionImage} />
+            <Image source={{ uri: getImageUrl(item.image) }} style={styles.promotionImage} />
             {item.discount_percentage > 0 && (
                 <View style={styles.discountBadge}>
                     <Text style={styles.discountText}>{item.discount_percentage}% OFF</Text>
@@ -74,7 +81,7 @@ export default function SearchScreen() {
 
     const renderResult = ({ item }: { item: any }) => (
         <TouchableOpacity style={styles.resultCard} onPress={() => router.push(`/product/${item.id}`)}>
-            <Image source={{ uri: item.image }} style={styles.resultImage} />
+            <Image source={{ uri: getImageUrl(item.image) }} style={styles.resultImage} />
             <View style={styles.resultInfo}>
                 <Text style={styles.resultName}>{item.name}</Text>
                 <Text style={styles.resultDescription} numberOfLines={2}>{item.description}</Text>
@@ -116,6 +123,7 @@ export default function SearchScreen() {
                     renderItem={renderResult}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.resultsList}
+                    showsVerticalScrollIndicator={false}
                 />
             ) : searchQuery.length > 0 ? (
                 <View style={styles.emptyState}>
@@ -138,19 +146,24 @@ export default function SearchScreen() {
                         </View>
                     )}
                     <View style={styles.suggestionsContainer}>
-                        <Text style={styles.suggestionsTitle}>Popular Searches</Text>
-                        {['Pizza', 'Burger', 'Pasta', 'Salad'].map((suggestion) => (
-                            <TouchableOpacity
-                                key={suggestion}
-                                style={styles.suggestionChip}
-                                onPress={() => {
-                                    setSearchQuery(suggestion);
-                                    handleSearch();
-                                }}
-                            >
-                                <Text style={styles.suggestionText}>{suggestion}</Text>
-                            </TouchableOpacity>
-                        ))}
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
+                            <TrendingUp size={20} color="#FF4500" style={{ marginRight: 8 }} />
+                            <Text style={styles.suggestionsTitle}>Trending Searches</Text>
+                        </View>
+                        <View style={styles.chipsWrapper}>
+                            {['Pizza', 'Burger', 'Pasta', 'Salad', 'Drinks', 'Cake'].map((suggestion) => (
+                                <TouchableOpacity
+                                    key={suggestion}
+                                    style={styles.suggestionChip}
+                                    onPress={() => {
+                                        setSearchQuery(suggestion);
+                                        handleSearch();
+                                    }}
+                                >
+                                    <Text style={styles.suggestionText}>{suggestion}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
                     </View>
                 </View>
             )}
@@ -180,12 +193,12 @@ const styles = StyleSheet.create({
         marginVertical: 15,
         paddingHorizontal: 15,
         paddingVertical: 12,
-        borderRadius: 12,
-        elevation: 2,
+        borderRadius: 15,
+        elevation: 3,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 2,
+        shadowRadius: 4,
     },
     searchInput: {
         flex: 1,
@@ -200,20 +213,20 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#1F2937',
         marginBottom: 15,
         paddingHorizontal: 20,
     },
     promotionCard: {
         width: 160,
         marginLeft: 20,
-        marginRight: 12,
+        marginRight: 10,
         backgroundColor: '#FFF',
-        borderRadius: 12,
+        borderRadius: 15,
         overflow: 'hidden',
-        elevation: 2,
+        elevation: 3,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 3,
     },
@@ -265,14 +278,14 @@ const styles = StyleSheet.create({
     resultCard: {
         flexDirection: 'row',
         backgroundColor: '#FFF',
-        borderRadius: 12,
+        borderRadius: 15,
         marginBottom: 15,
         overflow: 'hidden',
         elevation: 2,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 2,
+        shadowRadius: 3,
     },
     resultImage: {
         width: 100,
@@ -322,22 +335,26 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: 15,
+    },
+    chipsWrapper: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 10,
     },
     suggestionChip: {
         backgroundColor: '#FFF',
         paddingHorizontal: 16,
         paddingVertical: 10,
         borderRadius: 20,
-        marginBottom: 10,
-        elevation: 1,
+        elevation: 2,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
-        shadowRadius: 1,
+        shadowRadius: 2,
     },
     suggestionText: {
         fontSize: 14,
-        color: '#666',
+        color: '#4B5563',
+        fontWeight: '500',
     },
 });

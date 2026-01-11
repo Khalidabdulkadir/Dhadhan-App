@@ -1,7 +1,9 @@
 
 from rest_framework import serializers
-from django.contrib.auth.models import User
-from .models import Category, Product, Order, OrderItem
+from django.contrib.auth import get_user_model
+from .models import Category, Product, Order, OrderItem, Reel, SavedReel, Restaurant
+
+User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,21 +23,31 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
 
+class RestaurantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Restaurant
+        fields = '__all__'
+
 class CategorySerializer(serializers.ModelSerializer):
+    restaurant = serializers.PrimaryKeyRelatedField(queryset=Restaurant.objects.all(), required=False, allow_null=True)
+    restaurant_data = RestaurantSerializer(source='restaurant', read_only=True)
+    
     class Meta:
         model = Category
         fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):
     discounted_price = serializers.ReadOnlyField()
+    restaurant = serializers.PrimaryKeyRelatedField(queryset=Restaurant.objects.all(), required=False, allow_null=True)
+    restaurant_data = RestaurantSerializer(source='restaurant', read_only=True)
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'image', 'category', 'rating', 'calories', 'is_promoted', 'discount_percentage', 'discounted_price']
+        fields = ['id', 'name', 'description', 'price', 'image', 'category', 'rating', 'calories', 'is_promoted', 'discount_percentage', 'discounted_price', 'restaurant', 'restaurant_data']
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.ReadOnlyField(source='product.name')
-    product_image = serializers.ReadOnlyField(source='product.image')
+    product_image = serializers.ImageField(source='product.image', read_only=True)
 
     class Meta:
         model = OrderItem
@@ -105,11 +117,31 @@ class CreateOrderSerializer(serializers.Serializer):
                     amount=float(total),
                     narrative=f"Order {order.id}"
                 )
-                # You might want to store the invoice_id from response to check status later
-                # order.payment_ref = response.get('invoice', {}).get('invoice_id')
-                # order.save()
             except Exception as e:
                 print(f"Payment Error: {str(e)}")
-                # Optionally handle error, maybe set order status to 'payment_failed'
             
         return order
+
+class ReelSerializer(serializers.ModelSerializer):
+    product_details = ProductSerializer(source='product', read_only=True)
+    is_saved = serializers.SerializerMethodField()
+    restaurant = serializers.PrimaryKeyRelatedField(queryset=Restaurant.objects.all(), required=False, allow_null=True)
+    restaurant_data = RestaurantSerializer(source='restaurant', read_only=True)
+
+    class Meta:
+        model = Reel
+        fields = ['id', 'product', 'product_details', 'video', 'caption', 'views', 'created_at', 'is_saved', 'restaurant', 'restaurant_data']
+
+    def get_is_saved(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return SavedReel.objects.filter(user=request.user, reel=obj).exists()
+        return False
+
+class SavedReelSerializer(serializers.ModelSerializer):
+    reel_details = ReelSerializer(source='reel', read_only=True)
+    
+    class Meta:
+        model = SavedReel
+        fields = ['id', 'user', 'reel', 'reel_details', 'saved_at']
+        read_only_fields = ['user', 'saved_at']

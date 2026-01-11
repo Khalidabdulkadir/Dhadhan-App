@@ -55,9 +55,15 @@ export default function CheckoutScreen() {
             setStatus('received');
             clearCart();
             router.replace('/tracking');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Order failed:', error);
-            Alert.alert('Error', 'Failed to place order. Please try again.');
+            console.error('Error response:', error.response?.data);
+
+            const errorMessage = error.response?.data?.detail
+                || error.response?.data?.message
+                || 'Failed to place order. Please try again.';
+
+            Alert.alert('Order Error', errorMessage);
         } finally {
             setLoading(false);
         }

@@ -10,6 +10,10 @@ export interface Product {
     category: number;
     rating: number;
     calories: number;
+    restaurant_data?: {
+        name: string;
+        whatsapp_number: string;
+    };
 }
 
 export interface CartItem extends Product {

@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 // Force relative path in production to ensure we use the same domain (and avoid CORS/localhost issues)
-const API_URL = import.meta.env.PROD ? '/api' : (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api');
+// Force local development URL
+export const BASE_URL = 'http://127.0.0.1:8000';
+const API_URL = `${BASE_URL}/api`;
 
 const api = axios.create({
     baseURL: API_URL,
@@ -20,6 +22,20 @@ api.interceptors.request.use(
         return config;
     },
     (error) => Promise.reject(error)
+);
+
+// Add a response interceptor to handle auth errors
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            // Token expired or invalid
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
 );
 
 export default api;

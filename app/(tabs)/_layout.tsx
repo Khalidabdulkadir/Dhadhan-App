@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Search, ShoppingCart, User, UtensilsCrossed } from 'lucide-react-native';
+import { Search, ShoppingCart, Store, User, UtensilsCrossed, Video } from 'lucide-react-native';
 import React from 'react';
 import { useColorScheme } from 'react-native';
 
@@ -27,8 +27,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <Home color={color} size={24} />,
+          title: 'Reels',
+          tabBarIcon: ({ color }) => <Video color={color} size={24} />,
+        }}
+      />
+      <Tabs.Screen
+        name="home"
+        options={{
+          title: 'Store',
+          tabBarIcon: ({ color }) => <Store color={color} size={24} />,
         }}
       />
       <Tabs.Screen
@@ -38,6 +45,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <UtensilsCrossed color={color} size={24} />,
         }}
       />
+
       <Tabs.Screen
         name="search"
         options={{

@@ -4,7 +4,8 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
 // Replace with your machine's IP address or Production URL
-const API_URL = 'https://restruants-web-apps.onrender.com/api';
+export const BASE_URL = 'http://192.168.0.124:8000';
+const API_URL = `${BASE_URL}/api`;
 
 const api = axios.create({
     baseURL: API_URL,
