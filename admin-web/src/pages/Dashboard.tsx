@@ -236,7 +236,7 @@ export default function Dashboard() {
                   animationDuration={1500}
                 >
                   {
-                    orderStatusData.map((entry, index) => (
+                    orderStatusData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#4F46E5' : '#818CF8'} />
                     ))
                   }
