@@ -1,7 +1,7 @@
 services:
   - type: web
     name: dhadhan-backend
-    env: docker
+    runtime: docker
     envVars:
       - key: SECRET_KEY
         generateValue: true
