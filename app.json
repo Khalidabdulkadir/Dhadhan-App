@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Dhadhan",
-    "slug": "dhadhan",
+    "slug": "matrix-restaurant",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FF4500"
     },
     "ios": {
       "supportsTablet": true,
@@ -24,7 +24,11 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.matrix.restaurant"
+      "package": "com.matrix.restaurant",
+      "statusBar": {
+        "hidden": false,
+        "translucent": true
+      }
     },
     "web": {
       "bundler": "metro",

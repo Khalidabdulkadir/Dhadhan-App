@@ -10,9 +10,14 @@ export interface Product {
     category: number;
     rating: number;
     calories: number;
+    shipping_fee: number;
     restaurant_data?: {
         name: string;
         whatsapp_number: string;
+        bank_name?: string;
+        bank_account_number?: string;
+        paybill_number?: string;
+        till_number?: string;
     };
 }
 

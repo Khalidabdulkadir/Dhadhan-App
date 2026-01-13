@@ -11,7 +11,7 @@ export default function CartScreen() {
     const router = useRouter();
     const { items, incrementQuantity, decrementQuantity, removeItem, getTotal } = useCartStore();
     const subtotal = getTotal();
-    const deliveryFee = 500.00; // KSh
+    const deliveryFee = items.reduce((acc, item) => acc + (Number(item.shipping_fee) || 0), 0);
     const total = subtotal + deliveryFee;
 
     const getImageUrl = (url: string) => {
@@ -25,6 +25,7 @@ export default function CartScreen() {
             <Image source={{ uri: getImageUrl(item.image) }} style={styles.itemImage} />
             <View style={styles.itemContent}>
                 <View style={styles.itemInfo}>
+                    <Text style={styles.restaurantNameSmall}>{item.restaurant_data?.name}</Text>
                     <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
                     <Text style={styles.itemPrice}>KSh {Number(item.price).toFixed(2)}</Text>
                 </View>
@@ -79,7 +80,14 @@ export default function CartScreen() {
         message += `%0A*Delivery Fee:* KSh ${deliveryFee.toFixed(2)}`;
         message += `%0A*TOTAL:* KSh ${total.toFixed(2)}`;
         message += `%0A%0AMy Delivery Location: Nairobi (Please ask for exact pin)`;
-        message += `%0A%0APaying via M-Pesa to: ${restaurant.whatsapp_number}`;
+        message += `%0A%0APaying via: `;
+        if (restaurant.till_number) {
+            message += `Till Number ${restaurant.till_number}`;
+        } else if (restaurant.paybill_number) {
+            message += `Paybill ${restaurant.paybill_number}`;
+        } else {
+            message += `M-Pesa Number ${restaurant.whatsapp_number}`;
+        }
 
         const url = `whatsapp://send?phone=${restaurant.whatsapp_number}&text=${message}`;
 
@@ -92,7 +100,52 @@ export default function CartScreen() {
         });
     };
 
-    const restaurantNumber = items.length > 0 ? items[0].restaurant_data?.whatsapp_number : '';
+    const handleCallOrder = () => {
+        if (items.length === 0) return;
+        const restaurant = items[0].restaurant_data;
+        if (!restaurant || !restaurant.whatsapp_number) {
+            alert("Number not found");
+            return;
+        }
+        Linking.openURL(`tel:${restaurant.whatsapp_number}`);
+    };
+
+    const restaurant = items.length > 0 ? items[0].restaurant_data : null;
+    const restaurantNumber = restaurant?.whatsapp_number;
+
+    const renderFooter = () => (
+        <View style={{ paddingBottom: 20 }}>
+            {/* Payment Info in Scrollable Area */}
+            {(restaurantNumber || restaurant?.bank_name || restaurant?.paybill_number || restaurant?.till_number) && (
+                <View style={styles.paymentInfo}>
+                    <Text style={styles.paymentHeader}>Payment Details:</Text>
+
+                    {/* M-Pesa */}
+                    {restaurantNumber && (
+                        <Text style={styles.paymentInfoText}>M-Pesa: <Text style={styles.paymentPhone}>{restaurantNumber}</Text></Text>
+                    )}
+
+                    {/* Paybill */}
+                    {restaurant?.paybill_number && (
+                        <Text style={styles.paymentInfoText}>Paybill: <Text style={styles.paymentPhone}>{restaurant.paybill_number}</Text></Text>
+                    )}
+
+                    {/* Till */}
+                    {restaurant?.till_number && (
+                        <Text style={styles.paymentInfoText}>Till No: <Text style={styles.paymentPhone}>{restaurant.till_number}</Text></Text>
+                    )}
+
+                    {/* Bank */}
+                    {restaurant?.bank_name && (
+                        <View style={{ marginTop: 4 }}>
+                            <Text style={styles.paymentInfoText}>Bank: {restaurant.bank_name}</Text>
+                            <Text style={styles.paymentInfoText}>Acc: <Text style={styles.paymentPhone}>{restaurant.bank_account_number}</Text></Text>
+                        </View>
+                    )}
+                </View>
+            )}
+        </View>
+    );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -106,6 +159,7 @@ export default function CartScreen() {
                 keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
+                ListFooterComponent={renderFooter}
             />
 
             <View style={styles.footer}>
@@ -116,7 +170,11 @@ export default function CartScreen() {
                     </View>
                     <View style={styles.summaryRow}>
                         <Text style={styles.summaryLabel}>Delivery Fee</Text>
-                        <Text style={styles.summaryValue}>KSh {deliveryFee.toFixed(2)}</Text>
+                        {deliveryFee > 0 ? (
+                            <Text style={styles.summaryValue}>KSh {deliveryFee.toFixed(2)}</Text>
+                        ) : (
+                            <Text style={[styles.summaryValue, { color: '#059669' }]}>Free</Text>
+                        )}
                     </View>
                     <View style={styles.divider} />
                     <View style={styles.totalRow}>
@@ -125,18 +183,18 @@ export default function CartScreen() {
                     </View>
                 </View>
 
-                {/* M-Pesa Number Info */}
-                {restaurantNumber && (
-                    <View style={styles.paymentInfo}>
-                        <Text style={styles.paymentInfoText}>
-                            Pay M-Pesa to: <Text style={styles.paymentPhone}>{restaurantNumber}</Text>
-                        </Text>
-                    </View>
-                )}
+                <View style={{ gap: 12 }}>
+                    <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
+                        <Text style={styles.checkoutButtonText}>Order via WhatsApp</Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
-                    <Text style={styles.checkoutButtonText}>Order via WhatsApp</Text>
-                </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.checkoutButton, { backgroundColor: '#FFF', borderWidth: 2, borderColor: '#FF4500' }]}
+                        onPress={handleCallOrder}
+                    >
+                        <Text style={[styles.checkoutButtonText, { color: '#FF4500' }]}>Call to Order</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -247,6 +305,12 @@ const styles = StyleSheet.create({
     itemInfo: {
         marginBottom: 8,
     },
+    restaurantNameSmall: {
+        fontSize: 12,
+        color: '#6B7280',
+        fontWeight: '600',
+        marginBottom: 2,
+    },
     itemName: {
         fontSize: 16,
         fontWeight: 'bold',
@@ -352,5 +416,12 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    paymentHeader: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 6,
+        alignSelf: 'flex-start',
     },
 });

@@ -1,0 +1,5 @@
+backend/
+admin-web/
+.git/
+node_modules/
+.DS_Store

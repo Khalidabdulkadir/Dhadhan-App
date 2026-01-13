@@ -2,10 +2,16 @@
 import Skeleton from '@/components/Skeleton';
 import api, { BASE_URL } from '@/constants/api';
 import { useAuthStore } from '@/store/useAuthStore';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { ArrowRight, ChevronDown, Plus, User } from 'lucide-react-native';
+import { ArrowRight, BadgeCheck, Plus, Search } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+const { width } = Dimensions.get('window');
+// Use full width for paging container, card will have internal margin
+const CONTAINER_WIDTH = width;
+const CARD_WIDTH = width - 32; // Actual visual card width
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -15,15 +21,38 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<any[]>([]);
   const [brands, setBrands] = useState<any[]>([]);
-  const [popularItems, setPopularItems] = useState<any[]>([]);
-  const [promotions, setPromotions] = useState<any[]>([]);
+  const [verifiedBrands, setVerifiedBrands] = useState<any[]>([]); // NEW
+  const [campaignRestaurants, setCampaignRestaurants] = useState<any[]>([]);
+  const [offerRestaurants, setOfferRestaurants] = useState<any[]>([]);
+  const [offerProducts, setOfferProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  const campaignListRef = React.useRef<FlatList>(null);
+  const [activeCampaignIndex, setActiveCampaignIndex] = useState(0);
 
   useEffect(() => {
     checkAuth();
     fetchData();
   }, []);
+
+  // Auto-Scroll Effect
+  useEffect(() => {
+    if (campaignRestaurants.length <= 1) return;
+
+    const intervalId = setInterval(() => {
+      setActiveCampaignIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % campaignRestaurants.length;
+        campaignListRef.current?.scrollToIndex({
+          index: nextIndex,
+          animated: true,
+        });
+        return nextIndex;
+      });
+    }, 4000); // 4 seconds slide
+
+    return () => clearInterval(intervalId);
+  }, [campaignRestaurants]);
 
   const fetchData = async () => {
     try {
@@ -35,14 +64,29 @@ export default function HomeScreen() {
 
       setCategories(catRes.data);
 
-      const popularBrandsList = restRes.data.filter((r: any) => r.is_popular);
+      const allRestaurants = restRes.data;
+      const allProducts = prodRes.data;
+
+      // Hero Campaigns
+      const campaigns = allRestaurants.filter((r: any) => r.is_featured_campaign);
+      setCampaignRestaurants(campaigns);
+
+      // Verified Brands
+      const verified = allRestaurants.filter((r: any) => r.is_verified);
+      setVerifiedBrands(verified);
+
+      // Brands = Popular Restaurants
+      const popularBrandsList = allRestaurants.filter((r: any) => r.is_popular);
       setBrands(popularBrandsList);
 
-      const promotedProducts = prodRes.data.filter((p: any) => p.is_promoted);
-      setPromotions(promotedProducts);
+      // Offer Restaurants = Restaurants with Discount > 0
+      const discountRest = allRestaurants.filter((r: any) => Number(r.discount_percentage) > 0);
+      setOfferRestaurants(discountRest);
 
-      const nonPromoted = prodRes.data.filter((p: any) => !p.is_promoted);
-      setPopularItems(nonPromoted.slice(0, 5));
+      // Offer Products = Products where discounted_price < price
+      const discountProd = allProducts.filter((p: any) => p.discounted_price && p.discounted_price < p.price);
+      setOfferProducts(discountProd);
+
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -69,7 +113,47 @@ export default function HomeScreen() {
     return 'Good Evening';
   };
 
-  // ... render functions ...
+  // Render Functions
+
+  const renderSearchBar = () => (
+    <TouchableOpacity
+      style={styles.searchContainer}
+      onPress={() => router.push('/(tabs)/search')}
+      activeOpacity={0.9}
+    >
+      <Search size={20} color="#6B7280" />
+      <View style={styles.searchPlaceholder}>
+        <Text style={styles.searchText}>Find your favorite food...</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderHeroCampaign = ({ item }: { item: any }) => (
+    // Outer container takes Full Width for paging
+    <View style={{ width: CONTAINER_WIDTH, alignItems: 'center' }}>
+      <TouchableOpacity
+        style={[styles.heroCard, { width: CARD_WIDTH }]}
+        onPress={() => router.push(`/restaurant/${item.id}`)}
+        activeOpacity={0.95}
+      >
+        <Image source={{ uri: getImageUrl(item.campaign_image || item.cover_image || item.logo) }} style={styles.heroImage} />
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.8)']}
+          style={styles.heroOverlay}
+        >
+          <View style={styles.heroContent}>
+            {(item.discount_percentage > 0) && (
+              <View style={styles.heroBadge}>
+                <Text style={styles.heroBadgeText}>{Math.round(item.discount_percentage)}% OFF</Text>
+              </View>
+            )}
+            <Text style={styles.heroTitle} numberOfLines={1}>{item.name}</Text>
+            <Text style={styles.heroSubtitle} numberOfLines={1}>{item.description || "Limited Time Offer"}</Text>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+    </View>
+  );
 
   const renderCategory = ({ item }: { item: any }) => (
     <TouchableOpacity style={styles.categoryItem} onPress={() => router.push('/(tabs)/menu')}>
@@ -84,123 +168,93 @@ export default function HomeScreen() {
     <TouchableOpacity style={styles.restaurantCard} onPress={() => router.push(`/restaurant/${item.id}`)}>
       <View style={styles.restaurantImageContainer}>
         <Image source={{ uri: getImageUrl(item.logo) }} style={styles.restaurantImage} />
-        <View style={styles.restaurantOverlay}>
-          <View style={styles.restaurantTag}>
-            <Text style={styles.restaurantTagText}>20-30 min</Text>
+        {Number(item.discount_percentage) > 0 && (
+          <View style={styles.restaurantOverlay}>
+            <View style={styles.restaurantTag}>
+              <Text style={styles.restaurantTagText}>{Math.round(item.discount_percentage)}% OFF</Text>
+            </View>
           </View>
-        </View>
+        )}
       </View>
       <View style={styles.restaurantInfo}>
-        <Text style={styles.restaurantTitle} numberOfLines={1}>{item.name}</Text>
-        <Text style={styles.restaurantMeta} numberOfLines={1}>Burger • American</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginBottom: 2 }}>
+          <Text style={styles.restaurantTitle} numberOfLines={1}>{item.name}</Text>
+          {item.is_verified && (
+            // Matches Restaurant Details Page Style
+            <BadgeCheck size={16} color="#1877F2" fill="#1877F2" stroke="white" />
+          )}
+        </View>
+        <Text style={styles.restaurantMeta} numberOfLines={1}>{(item.discount_percentage > 0) ? `${Math.round(item.discount_percentage)}% Storewide` : 'Popular'}</Text>
       </View>
     </TouchableOpacity>
   );
 
-  const renderPopularItem = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.dishCard} onPress={() => router.push(`/product/${item.id}`)}>
-      <Image source={{ uri: getImageUrl(item.image) }} style={styles.dishImage} />
-      <View style={styles.dishInfo}>
-        <View style={styles.dishHeader}>
-          <Text style={styles.dishName} numberOfLines={1}>{item.name}</Text>
-          <Text style={styles.dishMeta} numberOfLines={1}>
-            {item.restaurant_data?.name || 'Burger'} • 20 min
-          </Text>
-        </View>
-        <View style={styles.dishFooter}>
-          <Text style={styles.dishPrice}>KSh {item.price}</Text>
-          <View style={styles.addBtn}>
-            <Plus color="#111" size={16} />
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const renderPromotion = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.featuredCard} onPress={() => router.push(`/product/${item.id}`)}>
-      <Image source={{ uri: getImageUrl(item.image) }} style={styles.featuredImage} />
+  const renderOfferRestaurant = ({ item }: { item: any }) => (
+    <TouchableOpacity style={styles.featuredCard} onPress={() => router.push(`/restaurant/${item.id}`)}>
+      {/* Use cover image for big impact */}
+      <Image source={{ uri: getImageUrl(item.cover_image || item.logo) }} style={styles.featuredImage} />
       <View style={styles.featuredOverlay}>
         <View style={styles.featuredTag}>
-          <Text style={styles.featuredTagText}>{item.discount_percentage}% OFF</Text>
+          <Text style={styles.featuredTagText}>{Math.round(item.discount_percentage)}% OFF</Text>
         </View>
         <View style={styles.featuredContent}>
           <Text style={styles.featuredName} numberOfLines={1}>{item.name}</Text>
-          <View style={styles.featuredPriceRow}>
-            <Text style={styles.featuredOldPrice}>KSh {item.price}</Text>
-            <Text style={styles.featuredPrice}>KSh {item.discounted_price}</Text>
-          </View>
+          <Text style={{ color: '#EEE', fontSize: 13, fontWeight: '500' }} numberOfLines={1}>
+            {item.description || "Limited time offer"}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
   );
 
-  // ... skeleton ...
+  const renderProductOffer = ({ item }: { item: any }) => (
+    <TouchableOpacity style={styles.offerCard} onPress={() => router.push(`/product/${item.id}`)}>
+      <Image source={{ uri: getImageUrl(item.image) }} style={styles.offerImage} />
+      <View style={styles.offerContent}>
+        <View style={styles.offerBadge}>
+          <Text style={styles.offerBadgeText}>SAVE</Text>
+        </View>
+        <Text style={styles.offerTitle} numberOfLines={1}>{item.name}</Text>
+        <View style={styles.offerPriceRow}>
+          <Text style={styles.offerPriceOld}>KSh {item.price}</Text>
+          <Text style={styles.offerPriceNew}>KSh {Math.round(item.discounted_price)}</Text>
+        </View>
+      </View>
+      <View style={styles.addBtnAbs}>
+        <Plus color="#FFF" size={16} />
+      </View>
+    </TouchableOpacity>
+  );
 
   const renderSkeleton = () => (
-    <View style={{ paddingTop: 20 }}>
-      {/* Header Skeleton */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, marginBottom: 25 }}>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <Skeleton width={120} height={35} style={{ borderRadius: 20 }} />
-        </View>
-        <Skeleton width={40} height={40} style={{ borderRadius: 20 }} />
+    <View style={{ flex: 1, paddingTop: 10 }}>
+      {/* Search Bar */}
+      <View style={{ paddingHorizontal: 16, marginBottom: 20 }}>
+        <Skeleton width={width - 32} height={50} style={{ borderRadius: 25 }} />
       </View>
 
-      {/* Categories Skeleton (Horizontal) */}
-      <View style={{ marginBottom: 30, paddingLeft: 20 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {[1, 2, 3, 4, 5].map(i => (
-            <View key={i} style={{ alignItems: 'center', marginRight: 25 }}>
-              <Skeleton width={75} height={75} style={{ borderRadius: 37.5, marginBottom: 10 }} />
-              <Skeleton width={50} height={12} />
-            </View>
-          ))}
-        </ScrollView>
-      </View>
-
-      {/* Brands Skeleton (Small Cards) */}
-      <View style={{ marginBottom: 25, paddingLeft: 20 }}>
-        <Skeleton width={150} height={20} style={{ marginBottom: 15 }} />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {[1, 2, 3].map(i => (
-            <View key={i} style={{ marginRight: 15 }}>
-              <Skeleton width={145} height={90} style={{ borderRadius: 12, marginBottom: 8 }} />
-              <Skeleton width={100} height={15} style={{ marginBottom: 4 }} />
-              <Skeleton width={80} height={12} />
-            </View>
-          ))}
-        </ScrollView>
-      </View>
-
-      {/* Hot Deals Skeleton (Featured Cards) */}
-      <View style={{ marginBottom: 25, paddingLeft: 20 }}>
-        <Skeleton width={120} height={20} style={{ marginBottom: 15 }} />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {[1, 2].map(i => (
-            <View key={i} style={{ marginRight: 15 }}>
-              <Skeleton width={220} height={260} style={{ borderRadius: 24 }} />
-            </View>
-          ))}
-        </ScrollView>
-      </View>
-
-      {/* Recommended Skeleton (Horizontal List) */}
-      <View style={{ paddingHorizontal: 20 }}>
-        <Skeleton width={180} height={20} style={{ marginBottom: 15 }} />
-        {[1, 2, 3].map(i => (
-          <View key={i} style={{ flexDirection: 'row', marginBottom: 15 }}>
-            <Skeleton width={110} height={110} style={{ borderRadius: 12, marginRight: 15 }} />
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Skeleton width="60%" height={20} style={{ marginBottom: 8 }} />
-              <Skeleton width="40%" height={15} style={{ marginBottom: 12 }} />
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Skeleton width={60} height={20} />
-                <Skeleton width={32} height={32} style={{ borderRadius: 16 }} />
-              </View>
-            </View>
+      {/* Categories */}
+      <View style={{ flexDirection: 'row', paddingLeft: 16, marginBottom: 24 }}>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <View key={i} style={{ marginRight: 20, alignItems: 'center' }}>
+            <Skeleton width={64} height={64} style={{ borderRadius: 32, marginBottom: 8 }} />
+            <Skeleton width={40} height={10} style={{ borderRadius: 4 }} />
           </View>
         ))}
+      </View>
+
+      {/* Hero */}
+      <View style={{ alignItems: 'center', marginBottom: 24 }}>
+        <Skeleton width={width - 32} height={170} style={{ borderRadius: 24 }} />
+      </View>
+
+      {/* List Section */}
+      <View style={{ paddingHorizontal: 16 }}>
+        <Skeleton width={120} height={20} style={{ marginBottom: 16, borderRadius: 4 }} />
+        <View style={{ flexDirection: 'row' }}>
+          <Skeleton width={280} height={104} style={{ borderRadius: 16, marginRight: 16 }} />
+          <Skeleton width={280} height={104} style={{ borderRadius: 16 }} />
+        </View>
       </View>
     </View>
   );
@@ -222,19 +276,8 @@ export default function HomeScreen() {
         }
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
-            <Text style={styles.deliverText}>Deliver now</Text>
-            <View style={styles.locationRow}>
-              <Text style={styles.locationText}>Home • Nairobi</Text>
-              <ChevronDown size={14} color="#111" style={{ marginLeft: 4 }} />
-            </View>
-          </View>
-          <TouchableOpacity style={styles.profileBtn} onPress={() => router.push('/(tabs)/profile')}>
-            <User color="#111" size={20} />
-          </TouchableOpacity>
-        </View>
+        {/* Search Bar */}
+        {renderSearchBar()}
 
         {/* Categories */}
         <View style={styles.sectionNoMargin}>
@@ -248,11 +291,57 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* Popular Brands (Brands) */}
+        {/* Hero Campaigns - Full Width Carousel */}
+        {campaignRestaurants.length > 0 && (
+          <View style={{ marginBottom: 24 }}>
+            <FlatList
+              ref={campaignListRef}
+              data={campaignRestaurants}
+              renderItem={renderHeroCampaign}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              pagingEnabled // Snaps to full width
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 0 }} // Remove wrapper padding, handled by item
+              snapToInterval={CONTAINER_WIDTH} // Interval = Screen Width
+              decelerationRate="fast"
+              onScrollToIndexFailed={(info) => {
+                const wait = new Promise(resolve => setTimeout(resolve, 500));
+                wait.then(() => {
+                  campaignListRef.current?.scrollToIndex({ index: info.index, animated: true });
+                });
+              }}
+            />
+          </View>
+        )}
+
+        {/* Verified Brands (NEW) */}
+        {verifiedBrands.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionHeading}>Verified Brands</Text>
+              <TouchableOpacity onPress={() => router.push('/list/verified')}>
+                <ArrowRight size={20} color="#111" />
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={verifiedBrands}
+              renderItem={renderBrand}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalScroll}
+            />
+          </View>
+        )}
+
+        {/* 1. Brands (Popular) */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionHeading}>Brands</Text>
-            <TouchableOpacity><ArrowRight size={20} color="#111" /></TouchableOpacity>
+            <Text style={styles.sectionHeading}>Top Brands</Text>
+            <TouchableOpacity onPress={() => router.push('/list/popular')}>
+              <ArrowRight size={20} color="#111" />
+            </TouchableOpacity>
           </View>
           <FlatList
             data={brands}
@@ -264,34 +353,39 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* Featured Deals (Horizontal) */}
-        {promotions.length > 0 && (
+        {/* 2. Special Offers (Products) */}
+        {offerProducts.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>🔥 Hot Deals</Text>
+              <Text style={styles.sectionHeading}>Special Offers</Text>
             </View>
             <FlatList
-              data={promotions}
-              renderItem={renderPromotion}
-              keyExtractor={item => item.id.toString()}
+              data={offerProducts}
+              renderItem={renderProductOffer}
+              keyExtractor={(item) => item.id.toString()}
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoriesList}
+              contentContainerStyle={styles.horizontalScroll}
             />
           </View>
         )}
 
-        {/* Popular Items (Vertical) */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionHeading}>Recommended for you</Text>
-          </View>
-          {popularItems.map((item) => (
-            <View key={item.id} style={{ marginBottom: 10, marginHorizontal: 16 }}>
-              {renderPopularItem({ item })}
+        {/* 3. Product Offers (Horizontal) */}
+        {offerProducts.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionHeading}>Hot Product Deals</Text>
             </View>
-          ))}
-        </View>
+            <FlatList
+              data={offerProducts}
+              renderItem={renderProductOffer}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalScroll}
+            />
+          </View>
+        )}
 
       </ScrollView>
     </View>
@@ -301,7 +395,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA', // Slightly off-white for premium feel
+    backgroundColor: '#FAFAFA',
   },
   header: {
     flexDirection: 'row',
@@ -334,240 +428,298 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
     borderRadius: 20,
   },
-  // Featured Card (Horizontal Scroll)
-  featuredCard: {
-    width: 220,
-    height: 260,
-    marginRight: 15,
-    borderRadius: 24,
-    overflow: 'hidden',
-    backgroundColor: '#FFF',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-  },
-  featuredImage: {
-    width: '100%',
-    height: '100%',
-  },
-  featuredOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '50%',
-    justifyContent: 'flex-end',
-    padding: 15,
-    backgroundColor: 'rgba(0,0,0,0.3)', // Lighter gradient
-  },
-  featuredTag: {
-    position: 'absolute',
-    top: 15,
-    left: 15,
-    backgroundColor: '#FF4500',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  featuredTagText: {
-    color: '#FFF',
-    fontSize: 11,
-    fontWeight: 'bold',
-  },
-  featuredContent: {
-    // text shadow for readability
-  },
-  featuredName: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 6,
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2
-  },
-  featuredPriceRow: {
+
+  // Search Bar
+  searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: '#F3F4F6', // Flat background
+    marginHorizontal: 16,
+    marginTop: 0, // "Above its now" - removed top margin
+    marginBottom: 20,
+    paddingHorizontal: 16,
+    height: 50,
+    borderRadius: 25,
+    // No Shadow/Border
   },
-  featuredOldPrice: {
-    color: '#E5E7EB',
-    textDecorationLine: 'line-through',
-    fontSize: 14,
-    fontWeight: '500',
+  searchPlaceholder: {
+    marginLeft: 12,
+    flex: 1,
   },
-  featuredPrice: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: '800',
+  searchText: {
+    fontSize: 15,
+    color: '#9CA3AF',
   },
+
+  // SECTIONS
   section: {
-    marginBottom: 8, // Aggressively reduced from 20
+    marginBottom: 16,
   },
   sectionNoMargin: {
-    marginTop: 8,
-    marginBottom: 12, // Reduced from 20
+    marginTop: 0,
+    marginBottom: 16,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16, // Aligned with list padding
-    marginBottom: 4, // Reduced from 15
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#111827',
+    paddingHorizontal: 16,
+    marginBottom: 8,
   },
   sectionHeading: {
-    fontSize: 18, // Slightly smaller header to match tighter space
+    fontSize: 20,
     fontWeight: '800',
     color: '#111',
     letterSpacing: -0.5,
   },
-  categoriesList: {
+  horizontalScroll: {
     paddingHorizontal: 16,
-    paddingBottom: 4, // Reduced from 10
+    paddingBottom: 10,
   },
   categoriesScroll: {
     paddingHorizontal: 16,
   },
-  horizontalScroll: {
-    paddingHorizontal: 16,
-  },
 
-  // CATEGORIES (Perfecr Circle)
+  // CATEGORIES
   categoryItem: {
     alignItems: 'center',
-    marginRight: 16,
-    width: 72,
+    marginRight: 20,
   },
   categoryIconContainer: {
-    width: 68,
-    height: 68,
-    borderRadius: 34, // Perfect circle
+    width: 56, // Smaller size (was 64)
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#F3F4F6',
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: 6,
-    overflow: 'hidden', // Ensure image fills the circle
+    overflow: 'hidden',
   },
   categoryIcon: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover', // Fill the circle completely
+    resizeMode: 'cover',
   },
   categoryLabel: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
     color: '#374151',
-    textAlign: 'center',
   },
 
-  // RESTAURANT CARDS (Brands - Original Style)
+  // HERO CAMPAIGN CARDS (Full Width)
+  heroCard: {
+    height: 170, // Smaller height as requested
+    marginRight: 0,
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 6,
+    marginBottom: 8,
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    inset: 0,
+    justifyContent: 'flex-end',
+    padding: 24, // More padding for premium feel
+  },
+  heroContent: {
+    gap: 6,
+  },
+  heroBadge: {
+    backgroundColor: '#FF4500',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 100,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  heroBadgeText: {
+    color: '#FFF',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  heroTitle: {
+    color: '#FFF',
+    fontSize: 32, // Larger title
+    fontWeight: '900',
+    letterSpacing: -1,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+  },
+  heroSubtitle: {
+    color: 'rgba(255,255,255,0.95)',
+    fontSize: 16,
+    fontWeight: '600',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+
+  // BRANDS (Clean Minimal Cards)
   restaurantCard: {
-    width: 145,
-    marginRight: 15,
+    width: 140,
+    marginRight: 10, // Reduced from 16 to 10
     backgroundColor: '#FFF',
-    borderRadius: 12,
-    marginBottom: 5,
+    borderRadius: 16,
+    padding: 12,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   restaurantImageContainer: {
-    width: '100%',
-    height: 90,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#E5E7EB',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 10,
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    backgroundColor: '#FFF',
   },
   restaurantImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover', // "Fit the design" - fill the container
+    borderRadius: 40,
+    resizeMode: 'cover',
   },
   restaurantOverlay: {
     position: 'absolute',
-    bottom: 6,
-    left: 6,
+    bottom: -6,
+    alignSelf: 'center',
   },
   restaurantTag: {
-    backgroundColor: '#FFF',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 8,
+    backgroundColor: '#FF4500',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
   },
   restaurantTagText: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: '#111',
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#FFF',
   },
   restaurantInfo: {
-    padding: 8,
+    alignItems: 'center',
+    width: '100%',
   },
   restaurantTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
     color: '#111',
+    textAlign: 'center',
     marginBottom: 2,
-    textAlign: 'left',
   },
   restaurantMeta: {
     fontSize: 11,
     color: '#6B7280',
     fontWeight: '500',
-    textAlign: 'left',
+    textAlign: 'center',
   },
 
-  // PRODUCT CARDS (Full Width Overlay - Smaller)
-  dishCard: {
-    flexDirection: 'column',
-    marginBottom: 15, // Less margin
-    backgroundColor: '#FFF',
-    borderRadius: 20, // Slightly less rounded
-    height: 170, // Much smaller height
+  // FEATURED OFFERS (Wide Hero Cards)
+  featuredCard: {
+    width: 300,
+    height: 180,
+    marginRight: 16,
+    borderRadius: 20,
     overflow: 'hidden',
-    elevation: 4,
+    backgroundColor: '#000',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  featuredImage: {
+    width: '100%',
+    height: '100%',
+    opacity: 0.8,
+  },
+  featuredOverlay: {
+    position: 'absolute',
+    inset: 0,
+    padding: 16,
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(0,0,0,0.2)',
+  },
+  featuredTag: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#FF4500',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 100,
+  },
+  featuredTagText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  featuredContent: {
+
+  },
+  featuredName: {
+    color: '#FFF',
+    fontSize: 22,
+    fontWeight: '800',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+
+  // PRODUCT DEALS (Clean Card Style)
+  dishCard: {
+    width: 170,
+    marginRight: 16,
+    backgroundColor: '#FFF',
+    borderRadius: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    overflow: 'hidden',
+    marginBottom: 8,
   },
   dishImage: {
     width: '100%',
-    height: '100%',
+    height: 110,
     resizeMode: 'cover',
   },
   dishInfo: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     padding: 12,
-    backgroundColor: 'rgba(0,0,0,0.5)', // Slightly darker for better text contrast
-    height: '100%',
-    justifyContent: 'flex-end',
+    flex: 1,
+    justifyContent: 'space-between',
   },
   dishHeader: {
     marginBottom: 4,
   },
   dishName: {
-    fontSize: 18, // Smaller font
-    fontWeight: '800',
-    color: '#FFF',
-    marginBottom: 2,
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
-  },
-  dishMeta: {
-    fontSize: 12, // Smaller meta
-    color: '#E5E7EB',
-    marginBottom: 6,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111',
+    lineHeight: 20,
+    marginBottom: 4,
   },
   dishFooter: {
     flexDirection: 'row',
@@ -575,18 +727,94 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   dishPrice: {
-    fontSize: 16, // Smaller price
+    fontSize: 16,
     fontWeight: '800',
-    color: '#FFF',
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    color: '#FF4500',
   },
   addBtn: {
+    backgroundColor: '#F3F4F6',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  // Special Offers (Product) Styles
+  offerCard: {
+    width: 280, // High width for horizontal card
+    marginRight: 16,
     backgroundColor: '#FFF',
-    width: 32, // Smaller btn
-    height: 32,
     borderRadius: 16,
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    position: 'relative',
+    height: 104,
+  },
+  offerImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+    resizeMode: 'cover',
+  },
+  offerContent: {
+    flex: 1,
+    marginLeft: 14,
+    justifyContent: 'center',
+    height: '100%',
+  },
+  offerBadge: {
+    position: 'absolute',
+    top: -4,
+    right: 0,
+    backgroundColor: '#FF4500',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    zIndex: 1,
+  },
+  offerBadgeText: {
+    color: '#FFF',
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
+  offerTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111',
+    marginTop: 4,
+    marginBottom: 4,
+    paddingRight: 10,
+  },
+  offerPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline', // Align old and new price
+    gap: 8,
+  },
+  offerPriceOld: {
+    fontSize: 13,
+    color: '#9CA3AF',
+    textDecorationLine: 'line-through',
+  },
+  offerPriceNew: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FF4500',
+  },
+  addBtnAbs: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    backgroundColor: '#111',
+    borderRadius: 20,
+    width: 32,
+    height: 32,
     justifyContent: 'center',
     alignItems: 'center',
   },

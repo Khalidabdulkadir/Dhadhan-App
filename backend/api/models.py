@@ -4,11 +4,23 @@ from django.contrib.auth.models import User
 class Restaurant(models.Model):
     name = models.CharField(max_length=100)
     logo = models.ImageField(upload_to='restaurants/', null=True, blank=True)
+    cover_image = models.ImageField(upload_to='restaurants/covers/', null=True, blank=True)
+    campaign_image = models.ImageField(upload_to='restaurants/campaigns/', null=True, blank=True, help_text="Image for Hero Campaign Slider")
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00, help_text="Discount percentage (0-100)")
+    is_verified = models.BooleanField(default=False)
     whatsapp_number = models.CharField(max_length=20)
     location = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     delivery_note = models.TextField(blank=True, help_text="Specific delivery instructions for this restaurant")
     is_popular = models.BooleanField(default=False)
+    is_featured_campaign = models.BooleanField(default=False, help_text="Show as Hero Campaign on Home Screen")
+    
+    # Payment Details
+    bank_name = models.CharField(max_length=100, blank=True, null=True)
+    bank_account_number = models.CharField(max_length=50, blank=True, null=True)
+    paybill_number = models.CharField(max_length=20, blank=True, null=True)
+    till_number = models.CharField(max_length=20, blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -31,13 +43,20 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/', null=True, blank=True)
     is_promoted = models.BooleanField(default=False)
     discount_percentage = models.IntegerField(default=0)
+    shipping_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Shipping fee for this product (0 for free)")
     rating = models.DecimalField(max_digits=3, decimal_places=1, default=5.0)
     calories = models.IntegerField(default=0)
     
     @property
     def discounted_price(self):
-        if self.is_promoted and self.discount_percentage > 0:
-            return self.price * (1 - self.discount_percentage / 100)
+        from decimal import Decimal
+        prod_discount = Decimal(self.discount_percentage) if (self.is_promoted and self.discount_percentage > 0) else Decimal(0)
+        rest_discount = self.restaurant.discount_percentage if self.restaurant else Decimal(0)
+        
+        effective_discount = max(prod_discount, rest_discount)
+        
+        if effective_discount > 0:
+            return self.price * (1 - (effective_discount / Decimal(100)))
         return self.price
 
     def __str__(self):

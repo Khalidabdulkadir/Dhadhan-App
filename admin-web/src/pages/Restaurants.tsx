@@ -13,6 +13,10 @@ interface Restaurant {
     description: string;
     delivery_note: string;
     created_at: string;
+    cover_image: string;
+    is_verified: boolean;
+    discount_percentage: number;
+    is_featured_campaign: boolean;
 }
 
 export default function Restaurants() {
@@ -30,9 +34,14 @@ export default function Restaurants() {
         description: '',
         delivery_note: '',
         logo: '',
+        is_verified: false,
+        discount_percentage: '',
+        is_featured_campaign: false,
     });
     const [logoFile, setLogoFile] = useState<File | null>(null);
     const [logoPreview, setLogoPreview] = useState<string>('');
+    const [coverFile, setCoverFile] = useState<File | null>(null);
+    const [coverPreview, setCoverPreview] = useState<string>('');
 
     useEffect(() => {
         fetchRestaurants();
@@ -67,8 +76,14 @@ export default function Restaurants() {
             data.append('location', formData.location);
             data.append('description', formData.description);
             data.append('delivery_note', formData.delivery_note);
+            data.append('is_verified', String(formData.is_verified));
+            data.append('discount_percentage', String(formData.discount_percentage));
+            data.append('is_featured_campaign', String(formData.is_featured_campaign));
             if (logoFile) {
                 data.append('logo', logoFile);
+            }
+            if (coverFile) {
+                data.append('cover_image', coverFile);
             }
 
             const config = {
@@ -110,9 +125,14 @@ export default function Restaurants() {
                 description: restaurant.description,
                 delivery_note: restaurant.delivery_note || '',
                 logo: restaurant.logo,
+                is_verified: restaurant.is_verified,
+                discount_percentage: restaurant.discount_percentage ? String(restaurant.discount_percentage) : '',
+                is_featured_campaign: restaurant.is_featured_campaign,
             });
             setLogoPreview(restaurant.logo ? getImageUrl(restaurant.logo) : '');
             setLogoFile(null);
+            setCoverPreview(restaurant.cover_image ? getImageUrl(restaurant.cover_image) : '');
+            setCoverFile(null);
         } else {
             setEditingRestaurant(null);
             setFormData({
@@ -122,9 +142,14 @@ export default function Restaurants() {
                 description: '',
                 delivery_note: '',
                 logo: '',
+                is_verified: false,
+                discount_percentage: '',
+                is_featured_campaign: false,
             });
             setLogoPreview('');
             setLogoFile(null);
+            setCoverPreview('');
+            setCoverFile(null);
         }
         setIsModalOpen(true);
     };
@@ -139,9 +164,14 @@ export default function Restaurants() {
             description: '',
             delivery_note: '',
             logo: '',
+            is_verified: false,
+            discount_percentage: '',
+            is_featured_campaign: false,
         });
         setLogoPreview('');
         setLogoFile(null);
+        setCoverPreview('');
+        setCoverFile(null);
     };
 
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,6 +179,14 @@ export default function Restaurants() {
         if (file) {
             setLogoFile(file);
             setLogoPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setCoverFile(file);
+            setCoverPreview(URL.createObjectURL(file));
         }
     };
 
@@ -245,7 +283,14 @@ export default function Restaurants() {
                             {/* Card Content */}
                             <div className="p-6 flex-1 flex flex-col">
                                 <div className="mb-4">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-1 line-clamp-1">{restaurant.name}</h3>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-1 line-clamp-1 flex items-center gap-2">
+                                        {restaurant.name}
+                                        {restaurant.is_verified && (
+                                            <svg className="w-5 h-5 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                            </svg>
+                                        )}
+                                    </h3>
                                     <div className="flex items-center text-gray-500 text-sm">
                                         <MapPin className="w-4 h-4 mr-1.5 flex-shrink-0" />
                                         <span className="truncate">{restaurant.location}</span>
@@ -302,10 +347,67 @@ export default function Restaurants() {
                 title={editingRestaurant ? 'Edit Restaurant' : 'New Restaurant'}
             >
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Cover Image Upload (Full Width) */}
+                    <div className="w-full">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Cover Image</label>
+                        <div
+                            className={`
+                                relative h-48 border-2 border-dashed rounded-2xl overflow-hidden transition-all cursor-pointer group
+                                ${coverPreview ? 'border-transparent' : 'border-gray-300 hover:border-primary hover:bg-gray-50'}
+                            `}
+                        >
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleCoverChange}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            />
+                            {coverPreview ? (
+                                <>
+                                    <img src={coverPreview} alt="Cover Preview" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white font-medium">
+                                        Change Cover Image (Used for Hero Campaign)
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                                    <Plus className="w-10 h-10 mb-2" />
+                                    <p className="font-medium">Add Cover Image (Hero)</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    {/* Campaign Toggle */}
+                    <div className="flex items-center pt-2 pb-4">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                className="sr-only peer"
+                                checked={formData.is_featured_campaign}
+                                onChange={(e) => setFormData({ ...formData, is_featured_campaign: e.target.checked })}
+                            />
+                            <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
+                            <span className="ml-3 text-sm font-semibold text-gray-700">
+                                {formData.is_featured_campaign ? 'Active Hero Campaign (Big Card)' : 'Standard Restaurant'}
+                            </span>
+                        </label>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Name Input */}
                         <div className="col-span-1 md:col-span-2">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Restaurant Name</label>
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="block text-sm font-semibold text-gray-700">Restaurant Name</label>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.is_verified}
+                                        onChange={(e) => setFormData({ ...formData, is_verified: e.target.checked })}
+                                        className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                                    />
+                                    <span className="text-sm font-medium text-gray-600">Verified Badge</span>
+                                </label>
+                            </div>
                             <input
                                 type="text"
                                 value={formData.name}
@@ -313,6 +415,20 @@ export default function Restaurants() {
                                 className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium"
                                 placeholder="e.g. Burger King"
                                 required
+                            />
+                        </div>
+
+                        {/* Discount Percentage */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Discount Percentage (%)</label>
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={formData.discount_percentage}
+                                onChange={(e) => setFormData({ ...formData, discount_percentage: e.target.value })}
+                                className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                                placeholder="0"
                             />
                         </div>
 

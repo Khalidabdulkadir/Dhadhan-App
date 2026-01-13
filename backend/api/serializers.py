@@ -43,7 +43,7 @@ class ProductSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'image', 'category', 'rating', 'calories', 'is_promoted', 'discount_percentage', 'discounted_price', 'restaurant', 'restaurant_data']
+        fields = ['id', 'name', 'description', 'price', 'image', 'category', 'rating', 'calories', 'is_promoted', 'discount_percentage', 'discounted_price', 'shipping_fee', 'restaurant', 'restaurant_data']
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.ReadOnlyField(source='product.name')
@@ -79,12 +79,14 @@ class CreateOrderSerializer(serializers.Serializer):
         for item in items_data:
             product = Product.objects.get(id=item['id'])
             quantity = item['quantity']
-            price = product.price * quantity
+            # Use discounted price
+            price_per_unit = product.discounted_price
+            price = price_per_unit * quantity
             total += price
             order_items.append({
                 'product': product,
                 'quantity': quantity,
-                'price': product.price
+                'price': price_per_unit
             })
             
         # Add delivery fee if applicable

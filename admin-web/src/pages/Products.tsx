@@ -15,6 +15,8 @@ interface Product {
     category_data?: { id: number; name: string };
     restaurant: number | null;
     restaurant_data?: { id: number; name: string };
+    discount_percentage: number;
+    is_promoted: boolean;
 }
 
 interface Category {
@@ -45,6 +47,8 @@ export default function Products() {
         restaurant: '',
         is_available: true,
         image: '',
+        discount_percentage: '',
+        is_promoted: false,
     });
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string>('');
@@ -105,6 +109,8 @@ export default function Products() {
                 data.append('restaurant', formData.restaurant);
             }
             data.append('is_available', String(formData.is_available));
+            data.append('discount_percentage', String(formData.discount_percentage));
+            data.append('is_promoted', String(formData.is_promoted));
             if (imageFile) {
                 data.append('image', imageFile);
             }
@@ -149,6 +155,8 @@ export default function Products() {
                 restaurant: product.restaurant?.toString() || '',
                 is_available: product.is_available,
                 image: product.image,
+                discount_percentage: product.discount_percentage ? String(product.discount_percentage) : '',
+                is_promoted: product.is_promoted,
             });
             setImagePreview(product.image ? getImageUrl(product.image) : '');
             setImageFile(null);
@@ -162,6 +170,8 @@ export default function Products() {
                 restaurant: '',
                 is_available: true,
                 image: '',
+                discount_percentage: '',
+                is_promoted: false,
             });
             setImagePreview('');
             setImageFile(null);
@@ -180,6 +190,8 @@ export default function Products() {
             restaurant: '',
             is_available: true,
             image: '',
+            discount_percentage: '',
+            is_promoted: false,
         });
         setImagePreview('');
         setImageFile(null);
@@ -376,6 +388,20 @@ export default function Products() {
                             </div>
                         </div>
 
+                        {/* Discount Percentage */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Discount Percentage (%)</label>
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={formData.discount_percentage}
+                                onChange={(e) => setFormData({ ...formData, discount_percentage: e.target.value })}
+                                className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium"
+                                placeholder="0"
+                            />
+                        </div>
+
                         {/* Category */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
@@ -419,6 +445,22 @@ export default function Products() {
                                 <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
                                 <span className="ml-3 text-sm font-semibold text-gray-700">
                                     {formData.is_available ? 'Available for ordering' : 'Mark as Unavailable'}
+                                </span>
+                            </label>
+                        </div>
+
+                        {/* Promoted Toggle */}
+                        <div className="flex items-center pt-8">
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={formData.is_promoted}
+                                    onChange={(e) => setFormData({ ...formData, is_promoted: e.target.checked })}
+                                />
+                                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-orange-500"></div>
+                                <span className="ml-3 text-sm font-semibold text-gray-700">
+                                    {formData.is_promoted ? 'Promoted (Hot Deal)' : 'Standard Listing'}
                                 </span>
                             </label>
                         </div>

@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { ResizeMode, Video } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { Eye, Heart, ShoppingBag } from 'lucide-react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -115,7 +116,7 @@ export default function ReelsScreen() {
         />
 
         {/* Right Side Actions - TikTok Style */}
-        <View style={[styles.rightActions, { bottom: 150 }]}>
+        <View style={[styles.rightActions, { bottom: 180 }]}>
           <View style={styles.actionButton}>
             <Eye color="#FFF" size={28} />
             <Text style={styles.actionText}>{item.views}</Text>
@@ -175,6 +176,7 @@ export default function ReelsScreen() {
 
   return (
     <View style={styles.container}>
+      <StatusBar style="light" backgroundColor="transparent" translucent={true} hidden={false} />
       <FlatList
         ref={flatListRef}
         data={reels}
