@@ -41,6 +41,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='products/', null=True, blank=True)
+    is_hot = models.BooleanField(default=False, help_text="Show in Hot Products section")
     is_promoted = models.BooleanField(default=False)
     discount_percentage = models.IntegerField(default=0)
     shipping_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Shipping fee for this product (0 for free)")
@@ -93,6 +94,7 @@ class Reel(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reels')
     video = models.FileField(upload_to='reels/')
     caption = models.TextField(blank=True)
+    is_highlight = models.BooleanField(default=False, help_text="Show this reel first")
     views = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 

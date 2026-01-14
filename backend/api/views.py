@@ -98,7 +98,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         return Response(read_serializer.data, status=status.HTTP_201_CREATED)
 
 class ReelViewSet(viewsets.ModelViewSet):
-    queryset = Reel.objects.all().order_by('-created_at')
+    queryset = Reel.objects.all().order_by('-is_highlight', '-created_at')
     serializer_class = ReelSerializer
     permission_classes = (permissions.AllowAny,) # Allow viewing by anyone, adjust if needed (e.g., ReadOnly for public)
 
@@ -109,7 +109,7 @@ class ReelViewSet(viewsets.ModelViewSet):
         return super().get_parsers()
 
     def get_queryset(self):
-        queryset = Reel.objects.all().order_by('-created_at')
+        queryset = Reel.objects.all().order_by('-is_highlight', '-created_at')
         restaurant = self.request.query_params.get('restaurant')
         if restaurant:
              queryset = queryset.filter(restaurant_id=restaurant)

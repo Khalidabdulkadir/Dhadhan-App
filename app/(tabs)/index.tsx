@@ -5,7 +5,7 @@ import { ResizeMode, Video } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Eye, Heart, ShoppingBag } from 'lucide-react-native';
+import { Bookmark, Eye, ShoppingBag } from 'lucide-react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -122,7 +122,7 @@ export default function ReelsScreen() {
             <Text style={styles.actionText}>{item.views}</Text>
           </View>
           <TouchableOpacity style={styles.actionButton} onPress={() => handleSave(item)}>
-            <Heart
+            <Bookmark
               color={item.is_saved ? '#FF4500' : '#FFF'}
               size={28}
               fill={item.is_saved ? '#FF4500' : 'transparent'}
@@ -132,7 +132,7 @@ export default function ReelsScreen() {
         </View>
 
         {/* Bottom Info */}
-        <View style={[styles.bottomInfo, { paddingBottom: 100 }]}>
+        <View style={[styles.bottomInfo, { paddingBottom: 70 }]}>
           <Text style={styles.caption}>{item.caption}</Text>
 
           {/* Product Card */}
@@ -187,6 +187,7 @@ export default function ReelsScreen() {
         snapToInterval={height}
         snapToAlignment="start"
         decelerationRate="fast"
+        disableIntervalMomentum={true}
         onViewableItemsChanged={handleViewableItemsChanged}
         viewabilityConfig={{
           itemVisiblePercentThreshold: 50

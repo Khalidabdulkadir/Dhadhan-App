@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Force relative path in production to ensure we use the same domain (and avoid CORS/localhost issues)
 // Force local development URL
-export const BASE_URL = 'https://dhadhan-app.onrender.com';
+export const BASE_URL = 'https://dhadhan-backend.onrender.com';
 const API_URL = `${BASE_URL}/api`;
 
 const api = axios.create({

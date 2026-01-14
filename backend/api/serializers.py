@@ -43,7 +43,7 @@ class ProductSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'image', 'category', 'rating', 'calories', 'is_promoted', 'discount_percentage', 'discounted_price', 'shipping_fee', 'restaurant', 'restaurant_data']
+        fields = ['id', 'name', 'description', 'price', 'image', 'category', 'rating', 'calories', 'is_hot', 'is_promoted', 'discount_percentage', 'discounted_price', 'shipping_fee', 'restaurant', 'restaurant_data']
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.ReadOnlyField(source='product.name')
@@ -132,7 +132,8 @@ class ReelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reel
-        fields = ['id', 'product', 'product_details', 'video', 'caption', 'views', 'created_at', 'is_saved', 'restaurant', 'restaurant_data']
+        model = Reel
+        fields = ['id', 'product', 'product_details', 'video', 'caption', 'is_highlight', 'views', 'created_at', 'is_saved', 'restaurant', 'restaurant_data']
 
     def get_is_saved(self, obj):
         request = self.context.get('request')

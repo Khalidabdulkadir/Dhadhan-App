@@ -25,6 +25,7 @@ export default function HomeScreen() {
   const [campaignRestaurants, setCampaignRestaurants] = useState<any[]>([]);
   const [offerRestaurants, setOfferRestaurants] = useState<any[]>([]);
   const [offerProducts, setOfferProducts] = useState<any[]>([]);
+  const [hotProducts, setHotProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -86,6 +87,10 @@ export default function HomeScreen() {
       // Offer Products = Products where discounted_price < price
       const discountProd = allProducts.filter((p: any) => p.discounted_price && p.discounted_price < p.price);
       setOfferProducts(discountProd);
+
+      // Hot Products
+      const hot = allProducts.filter((p: any) => p.is_hot);
+      setHotProducts(hot);
 
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -370,25 +375,54 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* 3. Product Offers (Horizontal) */}
-        {offerProducts.length > 0 && (
+        {/* 3. Hot Products (NEW - Vertical Layout) */}
+        {hotProducts.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionHeading}>Hot Product Deals</Text>
+              <Text style={styles.sectionHeading}>Hot Products</Text>
             </View>
-            <FlatList
-              data={offerProducts}
-              renderItem={renderProductOffer}
-              keyExtractor={(item) => item.id.toString()}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalScroll}
-            />
-          </View>
-        )}
+            <View style={styles.gridContainer}>
+              {hotProducts.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.hotProductCard}
+                  onPress={() => router.push(`/product/${item.id}`)}
+                  activeOpacity={0.9}
+                >
+                  <View>
+                    <Image source={{ uri: getImageUrl(item.image) }} style={styles.hotProductImage} />
 
-      </ScrollView>
-    </View>
+                    {/* Discount Badge for Hot Products */}
+                    {(item.discount_percentage > 0) && (
+                      <View style={styles.hotDiscountBadge}>
+                        <Text style={styles.hotDiscountText}>-{item.discount_percentage}%</Text>
+                      </View>
+                    )}
+
+                    <View style={styles.hotPriceTag}>
+                      <View style={styles.hotPriceRow}>
+                        <Text style={styles.hotPriceText}>KSh {item.discounted_price ? Math.round(item.discounted_price) : item.price}</Text>
+                        {item.discounted_price && item.discounted_price < item.price && (
+                          <Text style={styles.hotOldPrice}>{item.price}</Text>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={styles.hotProductContent}>
+                    <Text style={styles.hotProductTitle} numberOfLines={2}>{item.name}</Text>
+                    <Text style={styles.hotProductDesc} numberOfLines={1}>{item.description}</Text>
+                    {/* Add Button Removed as requested */}
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )
+        }
+
+      </ScrollView >
+    </View >
   );
 }
 
@@ -451,42 +485,93 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
   },
 
+
   // SECTIONS
   section: {
-    marginBottom: 16,
+    marginBottom: 12, // Reduced from 16
   },
   sectionNoMargin: {
     marginTop: 0,
-    marginBottom: 16,
+    marginBottom: 10, // Reduced from 16
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    marginBottom: 8,
+    marginBottom: 6, // Reduced from 8
   },
   sectionHeading: {
-    fontSize: 20,
+    fontSize: 17, // Reduced from 20
     fontWeight: '800',
     color: '#111',
     letterSpacing: -0.5,
   },
   horizontalScroll: {
     paddingHorizontal: 16,
-    paddingBottom: 10,
+    paddingBottom: 8, // Reduced from 10
   },
-  categoriesScroll: {
-    paddingHorizontal: 16,
+
+  // HERO (Full Width)
+  heroCard: {
+    height: 150, // Reduced from 170
+    marginRight: 0,
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    marginBottom: 6,
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    inset: 0,
+    justifyContent: 'flex-end',
+    padding: 16,
+  },
+  heroContent: {
+    gap: 4,
+  },
+  heroBadge: {
+    backgroundColor: '#FF4500',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 100,
+    alignSelf: 'flex-start',
+    marginBottom: 6,
+  },
+  heroBadgeText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  heroTitle: {
+    fontSize: 24, // Reduced from 32
+    fontWeight: '900',
+    letterSpacing: -0.5,
+    color: '#FFF',
+  },
+  heroSubtitle: {
+    color: 'rgba(255,255,255,0.95)',
+    fontSize: 14,
+    fontWeight: '600',
   },
 
   // CATEGORIES
+  categoriesScroll: {
+    paddingHorizontal: 16,
+  },
   categoryItem: {
     alignItems: 'center',
     marginRight: 20,
   },
   categoryIconContainer: {
-    width: 56, // Smaller size (was 64)
+    width: 56,
     height: 56,
     borderRadius: 28,
     backgroundColor: '#F3F4F6',
@@ -504,103 +589,29 @@ const styles = StyleSheet.create({
     color: '#374151',
   },
 
-  // HERO CAMPAIGN CARDS (Full Width)
-  heroCard: {
-    height: 170, // Smaller height as requested
-    marginRight: 0,
-    borderRadius: 24,
-    overflow: 'hidden',
-    backgroundColor: '#000',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 6,
-    marginBottom: 8,
-  },
-  heroImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  heroOverlay: {
-    position: 'absolute',
-    inset: 0,
-    justifyContent: 'flex-end',
-    padding: 24, // More padding for premium feel
-  },
-  heroContent: {
-    gap: 6,
-  },
-  heroBadge: {
-    backgroundColor: '#FF4500',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 100,
-    alignSelf: 'flex-start',
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  heroBadgeText: {
-    color: '#FFF',
-    fontSize: 13,
-    fontWeight: '900',
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-  },
-  heroTitle: {
-    color: '#FFF',
-    fontSize: 32, // Larger title
-    fontWeight: '900',
-    letterSpacing: -1,
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
-  },
-  heroSubtitle: {
-    color: 'rgba(255,255,255,0.95)',
-    fontSize: 16,
-    fontWeight: '600',
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
-  },
-
-  // BRANDS (Clean Minimal Cards)
+  // BRANDS
   restaurantCard: {
-    width: 140,
-    marginRight: 10, // Reduced from 16 to 10
+    width: 120, // Reduced from 140
+    marginRight: 10,
     backgroundColor: '#FFF',
     borderRadius: 16,
-    padding: 12,
+    padding: 10, // Reduced padding
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    borderWidth: 1, // Replace shadow with light border
+    borderColor: '#E5E7EB',
   },
   restaurantImageContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 10,
+    width: 70, // Reduced from 80
+    height: 70, // Reduced from 80
+    borderRadius: 35, // Half of width/height
+    marginBottom: 8,
     position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F3F4F6',
   },
   restaurantImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 40,
+    borderRadius: 35, // Half of width/height
     resizeMode: 'cover',
   },
   restaurantOverlay: {
@@ -637,19 +648,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // FEATURED OFFERS (Wide Hero Cards)
+  // FEATURED OFFERS
   featuredCard: {
-    width: 300,
-    height: 180,
+    width: 280,
+    height: 160,
     marginRight: 16,
     borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: '#000',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 5,
   },
   featuredImage: {
     width: '100%',
@@ -675,84 +681,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
   },
-  featuredContent: {
-
-  },
+  featuredContent: {},
   featuredName: {
     color: '#FFF',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '800',
     textShadowColor: 'rgba(0,0,0,0.5)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },
 
-  // PRODUCT DEALS (Clean Card Style)
-  dishCard: {
-    width: 170,
-    marginRight: 16,
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  dishImage: {
-    width: '100%',
-    height: 110,
-    resizeMode: 'cover',
-  },
-  dishInfo: {
-    padding: 12,
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  dishHeader: {
-    marginBottom: 4,
-  },
-  dishName: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#111',
-    lineHeight: 20,
-    marginBottom: 4,
-  },
-  dishFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  dishPrice: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#FF4500',
-  },
-  addBtn: {
-    backgroundColor: '#F3F4F6',
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  // Special Offers (Product) Styles
+  // OFFER CARDS (Product)
   offerCard: {
-    width: 280, // High width for horizontal card
+    width: 280,
     marginRight: 16,
     backgroundColor: '#FFF',
     borderRadius: 16,
     padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    borderWidth: 1, // Replace shadow with border
+    borderColor: '#E5E7EB',
     position: 'relative',
     height: 104,
   },
@@ -794,28 +743,105 @@ const styles = StyleSheet.create({
   },
   offerPriceRow: {
     flexDirection: 'row',
-    alignItems: 'baseline', // Align old and new price
+    alignItems: 'baseline',
     gap: 8,
   },
   offerPriceOld: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#9CA3AF',
     textDecorationLine: 'line-through',
   },
   offerPriceNew: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '800',
     color: '#FF4500',
   },
   addBtnAbs: {
     position: 'absolute',
     bottom: 12,
     right: 12,
-    backgroundColor: '#111',
-    borderRadius: 20,
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
+    backgroundColor: '#FF4500',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // HOT PRODUCTS (Grid)
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    gap: 10, // Reduced gap
+  },
+  hotProductCard: {
+    width: (width - 32 - 10) / 2, // Updated calculation
+    backgroundColor: '#FFF',
+    borderRadius: 12, // Reduced radius
+    marginBottom: 10,
+    borderWidth: 1, // Added border instead of shadow
+    borderColor: '#EEE',
+    overflow: 'hidden',
+  },
+  hotProductImage: {
+    width: '100%',
+    height: 120, // Reduced from 140
+    resizeMode: 'cover',
+  },
+  hotProductContent: {
+    padding: 10, // Reduced padding
+  },
+  hotPriceTag: {
+    position: 'absolute',
+    bottom: 6,
+    left: 6,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  hotPriceText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 12, // Reduced from 14
+  },
+  hotProductTitle: {
+    fontSize: 13, // Reduced from 16
+    fontWeight: '700',
+    color: '#111',
+    marginTop: 4,
+    marginBottom: 2,
+    lineHeight: 18,
+  },
+  hotProductDesc: {
+    fontSize: 11, // Reduced from 13
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  // Discount Styles for Hot Products
+  hotDiscountBadge: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    backgroundColor: '#FF4500',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  hotDiscountText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  hotOldPrice: {
+    fontSize: 11,
+    color: '#999',
+    textDecorationLine: 'line-through',
+    marginLeft: 4,
+  },
+  hotPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
   },
 });

@@ -131,14 +131,14 @@ export default function ProductDetailsScreen() {
                                 style={styles.quantityButton}
                                 onPress={() => setQuantity(Math.max(1, quantity - 1))}
                             >
-                                <Minus color="#111" size={20} />
+                                <Minus color="#FFF" size={18} />
                             </TouchableOpacity>
                             <Text style={styles.quantityText}>{quantity}</Text>
                             <TouchableOpacity
                                 style={styles.quantityButton}
                                 onPress={() => setQuantity(quantity + 1)}
                             >
-                                <Plus color="#111" size={20} />
+                                <Plus color="#FFF" size={18} />
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -165,7 +165,7 @@ export default function ProductDetailsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000', // Bg for image area
+        backgroundColor: '#FFF',
     },
     center: {
         justifyContent: 'center',
@@ -176,20 +176,20 @@ const styles = StyleSheet.create({
         top: 50,
         left: 20,
         zIndex: 100,
-        backgroundColor: '#FFF',
+        backgroundColor: 'rgba(255,255,255,0.9)', // Glass-like
         width: 44,
         height: 44,
         borderRadius: 22,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 5,
+        elevation: 10,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
     },
     imageContainer: {
-        height: 400, // Taller immersive image
+        height: 420, // Taller image
         width: '100%',
         position: 'relative',
         backgroundColor: '#F3F4F6',
@@ -201,143 +201,160 @@ const styles = StyleSheet.create({
     },
     badge: {
         position: 'absolute',
-        bottom: 50, // Move badge up so it's not hidden by sheet
+        bottom: 50,
         right: 20,
-        backgroundColor: '#FFDA45', // Glovo yellow
-        paddingHorizontal: 14,
-        paddingVertical: 8,
-        borderRadius: 20,
+        backgroundColor: '#FF4500', // Changed to Orange for better contrast
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
         zIndex: 10,
         elevation: 5,
+        shadowColor: '#FF4500',
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 4 },
     },
     badgeText: {
-        color: '#111',
-        fontSize: 13,
-        fontWeight: '800',
+        color: '#FFF',
+        fontSize: 12,
+        fontWeight: '900',
+        letterSpacing: 0.5,
     },
     content: {
+        flex: 1,
         backgroundColor: '#FFF',
-        borderTopLeftRadius: 32,
-        borderTopRightRadius: 32,
-        marginTop: -50, // Deeper overlap
-        paddingHorizontal: 25,
-        paddingTop: 35,
-        paddingBottom: 120, // Bottom padding for scrolling
-        minHeight: 500, // Ensure it fills
+        borderTopLeftRadius: 36, // Smoother curve
+        borderTopRightRadius: 36,
+        marginTop: -45,
+        paddingHorizontal: 24,
+        paddingTop: 32,
+        paddingBottom: 130,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
     },
     name: {
-        fontSize: 28,
-        fontWeight: '800',
+        fontSize: 26,
+        fontWeight: '900',
         color: '#111',
-        marginBottom: 15,
-        lineHeight: 34,
+        marginBottom: 8, // Tighter spacing
+        lineHeight: 32,
+        letterSpacing: -0.5,
     },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 15,
-        marginBottom: 25,
-        backgroundColor: '#F9FAFB',
-        padding: 12,
-        borderRadius: 16,
-        alignSelf: 'flex-start',
+        gap: 20,
+        marginBottom: 24,
+        paddingVertical: 4,
     },
     metaItem: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
+        backgroundColor: '#F9FAFB',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 8,
     },
     metaText: {
-        color: '#374151',
-        fontSize: 14,
+        color: '#4B5563',
+        fontSize: 13,
         fontWeight: '600',
     },
     priceContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 30,
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F3F4F6',
+        marginBottom: 32,
+        padding: 16,
+        backgroundColor: '#F8F9FA',
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#F1F5F9',
     },
     price: {
-        fontSize: 32,
-        fontWeight: '800',
+        fontSize: 28, // Slightly smaller but bolder
+        fontWeight: '900',
         color: '#111',
     },
     oldPrice: {
-        fontSize: 16,
+        fontSize: 15,
         color: '#9CA3AF',
         textDecorationLine: 'line-through',
-        marginTop: 4,
-        fontWeight: '500',
+        marginTop: 2,
+        fontWeight: '600',
     },
     quantityControl: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F3F4F6',
-        borderRadius: 30,
-        padding: 5,
+        backgroundColor: '#FFF',
+        borderRadius: 30, // Pill shape
+        padding: 4,
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 2,
     },
     quantityButton: {
-        width: 40,
-        height: 40, // Bigger touch targets
+        width: 36,
+        height: 36,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FFF',
-        borderRadius: 20,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
+        backgroundColor: '#111', // Black buttons
+        borderRadius: 18,
     },
     quantityText: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: '700',
-        marginHorizontal: 15,
+        marginHorizontal: 16,
         color: '#111',
-        minWidth: 20,
+        minWidth: 16,
         textAlign: 'center',
     },
     section: {
-        marginBottom: 20,
+        marginBottom: 24,
     },
     sectionTitle: {
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: 18, // Reduced from 20
+        fontWeight: '800',
         color: '#111',
-        marginBottom: 10,
+        marginBottom: 12,
+        letterSpacing: -0.5,
     },
     description: {
-        fontSize: 16,
-        color: '#4B5563',
+        fontSize: 15,
+        color: '#6B7280', // Lighter text
         lineHeight: 24,
+        fontWeight: '400',
     },
     footer: {
         position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: '#FFF',
-        paddingHorizontal: 20,
-        paddingTop: 15,
-        borderTopWidth: 1,
-        borderTopColor: '#F3F4F6',
-        elevation: 20,
+        bottom: 20,
+        left: 20,
+        right: 20,
+        backgroundColor: 'transparent',
     },
     addToCartButton: {
         flexDirection: 'row',
-        backgroundColor: '#111', // Bold Black button
+        backgroundColor: '#FF4500', // Signature Orange
         paddingVertical: 18,
-        borderRadius: 30,
+        borderRadius: 24, // Modern pill
         alignItems: 'center',
         justifyContent: 'center',
         gap: 12,
+        shadowColor: '#FF4500',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 10,
     },
     addToCartText: {
         color: '#FFF',
         fontSize: 16,
         fontWeight: '800',
+        letterSpacing: 0.5,
     },
 });

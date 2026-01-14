@@ -15,6 +15,7 @@ export default function RegisterScreen() {
         last_name: '',
     });
     const [loading, setLoading] = useState(false);
+    const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
     const handleRegister = async () => {
         if (!formData.email || !formData.password) {
@@ -41,67 +42,105 @@ export default function RegisterScreen() {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
             >
-                <ScrollView contentContainerStyle={[styles.content, { paddingBottom: Platform.OS === 'ios' ? 20 : 150 }]}>
-                    <View style={styles.headerContainer}>
-                        <Image
-                            source={{ uri: 'https://img.freepik.com/premium-vector/restaurant-logo-design-template_79169-56.jpg' }}
-                            style={styles.logo}
-                        />
-                        <Text style={styles.title}>Matrix Restaurant</Text>
-                        <Text style={styles.subtitle}>Create your account</Text>
-                    </View>
+                <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: Platform.OS === 'ios' ? 20 : 150 }]}>
+                    <View style={styles.content}>
+                        <View style={styles.logoContainer}>
+                            <Image
+                                source={require('@/assets/images/icon.png')}
+                                style={styles.logo}
+                            />
+                            <Text style={styles.appName}>Dhadhan</Text>
+                        </View>
 
-                    <View style={styles.form}>
-                        <Text style={styles.label}>Email *</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter your email"
-                            value={formData.email}
-                            onChangeText={(text) => setFormData({ ...formData, email: text })}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        />
+                        <View style={styles.formCard}>
+                            <Text style={styles.title}>Create Account</Text>
+                            <Text style={styles.subtitle}>Join us to order delicious food</Text>
 
-                        <Text style={styles.label}>First Name</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter your first name"
-                            value={formData.first_name}
-                            onChangeText={(text) => setFormData({ ...formData, first_name: text })}
-                        />
+                            <View style={styles.inputGroup}>
+                                <Text style={styles.label}>Email *</Text>
+                                <TextInput
+                                    style={[
+                                        styles.input,
+                                        focusedInput === 'email' && styles.inputFocused
+                                    ]}
+                                    placeholder="Enter your email"
+                                    placeholderTextColor="#999"
+                                    value={formData.email}
+                                    onChangeText={(text) => setFormData({ ...formData, email: text })}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    onFocus={() => setFocusedInput('email')}
+                                    onBlur={() => setFocusedInput(null)}
+                                />
+                            </View>
 
-                        <Text style={styles.label}>Last Name</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter your last name"
-                            value={formData.last_name}
-                            onChangeText={(text) => setFormData({ ...formData, last_name: text })}
-                        />
+                            <View style={styles.row}>
+                                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                                    <Text style={styles.label}>First Name</Text>
+                                    <TextInput
+                                        style={[
+                                            styles.input,
+                                            focusedInput === 'first_name' && styles.inputFocused
+                                        ]}
+                                        placeholder="First name"
+                                        placeholderTextColor="#999"
+                                        value={formData.first_name}
+                                        onChangeText={(text) => setFormData({ ...formData, first_name: text })}
+                                        onFocus={() => setFocusedInput('first_name')}
+                                        onBlur={() => setFocusedInput(null)}
+                                    />
+                                </View>
+                                <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
+                                    <Text style={styles.label}>Last Name</Text>
+                                    <TextInput
+                                        style={[
+                                            styles.input,
+                                            focusedInput === 'last_name' && styles.inputFocused
+                                        ]}
+                                        placeholder="Last name"
+                                        placeholderTextColor="#999"
+                                        value={formData.last_name}
+                                        onChangeText={(text) => setFormData({ ...formData, last_name: text })}
+                                        onFocus={() => setFocusedInput('last_name')}
+                                        onBlur={() => setFocusedInput(null)}
+                                    />
+                                </View>
+                            </View>
 
-                        <Text style={styles.label}>Password *</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Create a password"
-                            value={formData.password}
-                            onChangeText={(text) => setFormData({ ...formData, password: text })}
-                            secureTextEntry
-                        />
+                            <View style={styles.inputGroup}>
+                                <Text style={styles.label}>Password *</Text>
+                                <TextInput
+                                    style={[
+                                        styles.input,
+                                        focusedInput === 'password' && styles.inputFocused
+                                    ]}
+                                    placeholder="Create a password"
+                                    placeholderTextColor="#999"
+                                    value={formData.password}
+                                    onChangeText={(text) => setFormData({ ...formData, password: text })}
+                                    secureTextEntry
+                                    onFocus={() => setFocusedInput('password')}
+                                    onBlur={() => setFocusedInput(null)}
+                                />
+                            </View>
 
-                        <TouchableOpacity
-                            style={[styles.button, loading && styles.buttonDisabled]}
-                            onPress={handleRegister}
-                            disabled={loading}
-                        >
-                            <Text style={styles.buttonText}>{loading ? 'Creating Account...' : 'Sign Up'}</Text>
-                        </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.button, loading && styles.buttonDisabled]}
+                                onPress={handleRegister}
+                                disabled={loading}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={styles.buttonText}>{loading ? 'Creating Account...' : 'Sign Up'}</Text>
+                            </TouchableOpacity>
 
-                        <View style={styles.footer}>
-                            <Text style={styles.footerText}>Already have an account? </Text>
-                            <Link href={"/auth/login" as any} asChild>
-                                <TouchableOpacity>
-                                    <Text style={styles.link}>Sign In</Text>
-                                </TouchableOpacity>
-                            </Link>
+                            <View style={styles.footer}>
+                                <Text style={styles.footerText}>Already have an account? </Text>
+                                <Link href={"/auth/login" as any} asChild>
+                                    <TouchableOpacity>
+                                        <Text style={styles.link}>Sign In</Text>
+                                    </TouchableOpacity>
+                                </Link>
+                            </View>
                         </View>
                     </View>
                 </ScrollView>
@@ -113,55 +152,97 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFF',
+        backgroundColor: '#F8F9FA',
+    },
+    scrollContent: {
+        flexGrow: 1,
+        justifyContent: 'center',
     },
     content: {
-        padding: 20,
-        paddingTop: 40,
+        padding: 24,
     },
-    headerContainer: {
+    logoContainer: {
         alignItems: 'center',
-        marginBottom: 30,
+        marginBottom: 40,
     },
     logo: {
         width: 80,
         height: 80,
-        borderRadius: 40,
-        marginBottom: 15,
+        marginBottom: 16,
+        borderRadius: 20,
+    },
+    appName: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#1A1A1A',
+        letterSpacing: 0.5,
+    },
+    formCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 24,
+        padding: 24,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 12,
+        elevation: 4,
     },
     title: {
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 10,
+        color: '#1A1A1A',
+        marginBottom: 8,
+        textAlign: 'center',
     },
     subtitle: {
         fontSize: 16,
         color: '#666',
-        marginBottom: 30,
+        textAlign: 'center',
+        marginBottom: 32,
     },
-    form: {
-        width: '100%',
+    row: {
+        flexDirection: 'row',
+    },
+    inputGroup: {
+        marginBottom: 20,
     },
     label: {
         fontSize: 14,
+        fontWeight: '600',
         color: '#333',
         marginBottom: 8,
-        fontWeight: '600',
+        marginLeft: 4,
     },
     input: {
-        backgroundColor: '#F5F5F5',
-        padding: 15,
-        borderRadius: 12,
-        marginBottom: 20,
+        backgroundColor: '#F3F4F6',
+        padding: 16,
+        borderRadius: 16,
         fontSize: 16,
+        color: '#1A1A1A',
+        borderWidth: 2,
+        borderColor: 'transparent',
+    },
+    inputFocused: {
+        borderColor: '#FF4500',
+        backgroundColor: '#FFF5F2',
     },
     button: {
         backgroundColor: '#FF4500',
         padding: 18,
-        borderRadius: 12,
+        borderRadius: 16,
         alignItems: 'center',
-        marginTop: 10,
+        marginTop: 12,
+        shadowColor: '#FF4500',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 4,
     },
     buttonDisabled: {
         opacity: 0.7,
@@ -174,16 +255,15 @@ const styles = StyleSheet.create({
     footer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginTop: 20,
-        marginBottom: 40,
+        marginTop: 24,
     },
     footerText: {
         color: '#666',
-        fontSize: 14,
+        fontSize: 15,
     },
     link: {
         color: '#FF4500',
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: 'bold',
     },
 });

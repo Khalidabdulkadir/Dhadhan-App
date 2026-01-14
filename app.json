@@ -28,7 +28,15 @@
       "statusBar": {
         "hidden": false,
         "translucent": true
-      }
+      },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": {
+            "scheme": "whatsapp"
+          }
+        }
+      ]
     },
     "web": {
       "bundler": "metro",

@@ -25,3 +25,8 @@ class RestaurantAdmin(admin.ModelAdmin):
     list_display = ('name', 'discount_percentage', 'is_verified', 'is_popular', 'is_featured_campaign')
     list_editable = ('discount_percentage', 'is_verified', 'is_popular', 'is_featured_campaign')
     search_fields = ('name', 'location')
+
+@admin.register(Reel)
+class ReelAdmin(admin.ModelAdmin):
+    list_display = ('product', 'is_highlight', 'views')
+    list_editable = ('is_highlight',)
