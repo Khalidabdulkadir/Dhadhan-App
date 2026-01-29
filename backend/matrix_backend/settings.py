@@ -15,17 +15,18 @@ SECRET_KEY = 'django-insecure-change-me-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']  # Update this to specific hosts in strict production environments
+ALLOWED_HOSTS = ['abi.sominnovations.xyz', '206.189.58.214', 'localhost', '127.0.0.1']
 
 
 # Application definition
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8081",
-    "http://localhost:5173", # Admin Web
+    "http://localhost:5173",
     "http://192.168.0.124:8081",
     "http://127.0.0.1:5173",
-    "https://restruants-web-apps.onrender.com",
+    "http://admin.sominnovations.xyz",
+    "https://admin.sominnovations.xyz",
 ]
 
 INSTALLED_APPS = [
@@ -83,6 +84,16 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+if os.environ.get('DB_ENGINE') == 'postgresql':
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB', 'dhadhan_db'),
+        'USER': os.environ.get('POSTGRES_USER', 'dhadhan_user'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'dhadhan_@2020'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+    }
 
 
 # Password validation
@@ -150,7 +161,7 @@ SIMPLE_JWT = {
 
 # CORS Configuration
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+CSRF_TRUSTED_ORIGINS = ['https://abi.sominnovations.xyz', 'http://abi.sominnovations.xyz', 'http://206.189.58.214']
 
 # IntaSend Configuration
 INTASEND_PUBLISHABLE_KEY = os.environ.get('INTASEND_PUBLISHABLE_KEY', 'ISPubKey_test_aaf769df-c75f-4e9c-9548-95ba870dbba8')

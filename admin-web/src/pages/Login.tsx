@@ -44,7 +44,7 @@ export default function Login() {
                     <div className="mb-8 inline-block animate-slideUp" style={{ animationDelay: '0.1s' }}>
                         <div className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl shadow-2xl">
                             <h2 className="text-6xl font-black text-white tracking-tight drop-shadow-xl">
-                                Matrix<span className="text-orange-500">Admin</span>
+                                Dhadhan<span className="text-orange-500">Admin</span>
                             </h2>
                         </div>
                     </div>

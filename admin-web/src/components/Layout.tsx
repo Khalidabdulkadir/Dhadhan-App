@@ -32,7 +32,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         <div className="bg-gradient-to-br from-orange-500 to-red-600 p-2.5 rounded-xl shadow-lg shadow-orange-500/30 transform hover:scale-105 transition-transform duration-300">
                             <UtensilsCrossed className="w-6 h-6 text-white" />
                         </div>
-                        <h1 className="text-2xl font-black text-gray-900 tracking-tight">Matrix<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600">Admin</span></h1>
+                        <h1 className="text-2xl font-black text-gray-900 tracking-tight">Dhadhan<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600">Admin</span></h1>
                     </div>
                     <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 px-2 font-mono">Main Menu</div>
                 </div>
@@ -70,7 +70,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         <span>Sign Out</span>
                     </button>
                     <div className="mt-4 text-center text-[10px] font-mono text-gray-400 uppercase tracking-widest">
-                        v2.0.0 • Matrix Systems
+                        v2.0.0 • Dhadhan Systems
                     </div>
                 </div>
             </aside>

@@ -1,0 +1,80 @@
+diff --git a/node_modules/react-native-worklets/src/deprecated.ts b/node_modules/react-native-worklets/src/deprecated.ts
+index facaea9..06a945f 100644
+--- a/node_modules/react-native-worklets/src/deprecated.ts
++++ b/node_modules/react-native-worklets/src/deprecated.ts
+@@ -5,7 +5,7 @@ import {
+   isSerializableRef,
+   makeShareable,
+   makeShareableCloneOnUIRecursive,
+-} from './serializable';
++} from './serializable.ts';
+ import { serializableMappingCache } from './serializableMappingCache';
+ import type { SerializableRef } from './workletTypes';
+ 
+diff --git a/node_modules/react-native-worklets/src/index.ts b/node_modules/react-native-worklets/src/index.ts
+index 795e96c..29c108a 100644
+--- a/node_modules/react-native-worklets/src/index.ts
++++ b/node_modules/react-native-worklets/src/index.ts
+@@ -2,27 +2,27 @@
+ 
+ import './publicGlobals';
+ 
+-import { init } from './initializers';
++import { init } from './initializers.ts';
+ import { bundleModeInit } from './workletRuntimeEntry';
+ 
+ init();
+ 
+-export type { MakeShareableClone, ShareableRef } from './deprecated';
+ export {
+   isShareableRef,
+   makeShareable,
+   makeShareableCloneOnUIRecursive,
+   makeShareableCloneRecursive,
+-  shareableMappingCache,
+-} from './deprecated';
+-export { getStaticFeatureFlag, setDynamicFeatureFlag } from './featureFlags';
+-export { isSynchronizable } from './isSynchronizable';
+-export { getRuntimeKind, RuntimeKind } from './runtimeKind';
+-export { createWorkletRuntime, runOnRuntime } from './runtimes';
+-export { createSerializable, isSerializableRef } from './serializable';
+-export { serializableMappingCache } from './serializableMappingCache';
+-export type { Synchronizable } from './synchronizable';
+-export { createSynchronizable } from './synchronizable';
++  shareableMappingCache
++} from './deprecated.ts';
++export type { MakeShareableClone, ShareableRef } from './deprecated.ts';
++export { getStaticFeatureFlag, setDynamicFeatureFlag } from './featureFlags/index.ts';
++export { isSynchronizable } from './isSynchronizable.ts';
++export { getRuntimeKind, RuntimeKind } from './runtimeKind.ts';
++export { createWorkletRuntime, runOnRuntime } from './runtimes.ts';
++export { createSerializable, isSerializableRef } from './serializable.ts';
++export { serializableMappingCache } from './serializableMappingCache.ts';
++export { createSynchronizable } from './synchronizable.ts';
++export type { Synchronizable } from './synchronizable.ts';
+ export {
+   callMicrotasks,
+   executeOnUIRuntimeSync,
+@@ -33,16 +33,16 @@ export {
+   scheduleOnRN,
+   scheduleOnUI,
+   // eslint-disable-next-line camelcase
+-  unstable_eventLoopTask,
+-} from './threads';
+-export { isWorkletFunction } from './workletFunction';
+-export type { IWorkletsModule, WorkletsModuleProxy } from './WorkletsModule';
+-export { WorkletsModule } from './WorkletsModule';
++  unstable_eventLoopTask
++} from './threads.ts';
++export { isWorkletFunction } from './workletFunction.ts';
++export { WorkletsModule } from './WorkletsModule/index.ts';
++export type { IWorkletsModule, WorkletsModuleProxy } from './WorkletsModule/index.ts';
+ export type {
+   SerializableRef,
+   WorkletFunction,
+   WorkletRuntime,
+-  WorkletStackDetails,
++  WorkletStackDetails
+ } from './workletTypes';
+ 
+ // @ts-expect-error We must trick the bundler to include

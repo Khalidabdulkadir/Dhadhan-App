@@ -1,8 +1,9 @@
 
-import api, { BASE_URL } from '@/constants/api';
+import api from '@/constants/api';
+import { getImageUrl } from '@/utils/image';
 import { useRouter } from 'expo-router';
 import { Search as SearchIcon, TrendingUp, X } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -12,6 +13,8 @@ export default function SearchScreen() {
     const [results, setResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [promotions, setPromotions] = useState<any[]>([]);
+    const flatListRef = useRef<FlatList>(null);
+    const scrollIndex = useRef(0);
 
     React.useEffect(() => {
         fetchPromotions();
@@ -23,15 +26,27 @@ export default function SearchScreen() {
             const promotedProducts = response.data.filter((p: any) => p.is_promoted);
             setPromotions(promotedProducts);
         } catch (error) {
-            console.error('Error fetching promotions:', error);
+            // Error fetching
         }
     };
+    // Auto-scroll effect
+    useEffect(() => {
+        if (promotions.length === 0) return;
 
-    const getImageUrl = (url: string) => {
-        if (!url) return 'https://via.placeholder.com/150';
-        if (url.startsWith('http')) return url;
-        return `${BASE_URL}${url}`;
-    };
+        const interval = setInterval(() => {
+            if (flatListRef.current) {
+                scrollIndex.current = (scrollIndex.current + 1) % promotions.length;
+                flatListRef.current.scrollToIndex({
+                    index: scrollIndex.current,
+                    animated: true,
+                    viewPosition: 0.5
+                });
+            }
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [promotions]);
+
 
     const handleSearch = async () => {
         if (!searchQuery.trim()) {
@@ -48,7 +63,7 @@ export default function SearchScreen() {
             );
             setResults(filtered);
         } catch (error) {
-            console.error('Error searching:', error);
+            // Error searching
         } finally {
             setLoading(false);
         }
@@ -136,12 +151,24 @@ export default function SearchScreen() {
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>🔥 Special Offers</Text>
                             <FlatList
+                                ref={flatListRef}
                                 data={promotions}
                                 renderItem={renderPromotion}
                                 keyExtractor={(item) => item.id.toString()}
                                 horizontal
                                 showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={{ paddingRight: 20 }}
+                                contentContainerStyle={{ paddingRight: 15 }}
+                                getItemLayout={(data, index) => ({
+                                    length: 170, // width 150 + margin 20
+                                    offset: 170 * index,
+                                    index,
+                                })}
+                                onScrollToIndexFailed={(info) => {
+                                    const wait = new Promise(resolve => setTimeout(resolve, 500));
+                                    wait.then(() => {
+                                        flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
+                                    });
+                                }}
                             />
                         </View>
                     )}
@@ -189,16 +216,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#FFF',
-        marginHorizontal: 20,
-        marginVertical: 15,
-        paddingHorizontal: 15,
-        paddingVertical: 12,
-        borderRadius: 15,
-        elevation: 3,
+        marginHorizontal: 15,
+        marginVertical: 10,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        borderRadius: 12,
+        elevation: 2,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08,
+        shadowRadius: 3,
     },
     searchInput: {
         flex: 1,
@@ -211,16 +238,16 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     sectionTitle: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
         color: '#1F2937',
-        marginBottom: 15,
-        paddingHorizontal: 20,
+        marginBottom: 10,
+        paddingHorizontal: 15,
     },
     promotionCard: {
-        width: 160,
-        marginLeft: 20,
-        marginRight: 10,
+        width: 150,
+        marginLeft: 15,
+        marginRight: 5,
         backgroundColor: '#FFF',
         borderRadius: 15,
         overflow: 'hidden',

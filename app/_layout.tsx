@@ -3,7 +3,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { setStatusBarHidden, StatusBar } from 'expo-status-bar';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
@@ -63,24 +63,30 @@ function RootLayoutNav() {
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
 
-  // Check if we are on the Reels page (root path or index)
-  const isReels = pathname === '/' || pathname === '/index';
+  // Check if we are on the Reels page
+  // Using includes for safety against /reels, /reels/, or (tabs)/reels
+  const isReels = pathname?.includes('reels');
 
-  useEffect(() => {
-    // Force status bar to be visible on every navigation
-    setStatusBarHidden(false, 'none');
-  }, [pathname]);
+  // We removed the setStatusBarHidden effect to stop layout jumps (Box jumps when status bar disappears)
+  // Instead we just use transparent background for Reels
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <StatusBar style="light" backgroundColor={isReels ? 'transparent' : '#FF4500'} hidden={false} />
-      {/* Manually render status bar background for non-Reels pages */}
+      <StatusBar
+        style="light"
+        backgroundColor={isReels ? 'transparent' : '#FF4500'}
+        translucent={true}
+        hidden={false}
+      />
+      {/* Manually render status bar background for non-Reels pages to handle safe area */}
       {!isReels && (
         <View style={{ height: insets.top, backgroundColor: '#FF4500' }} />
       )}
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="restaurant/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="product/[id]" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );

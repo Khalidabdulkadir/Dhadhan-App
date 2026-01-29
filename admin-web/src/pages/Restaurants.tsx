@@ -259,6 +259,15 @@ export default function Restaurants() {
                                     </div>
                                 )}
 
+                                {/* Discount Badge */}
+                                {restaurant.discount_percentage > 0 && (
+                                    <div className="absolute top-4 left-4 z-20">
+                                        <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm backdrop-blur-md">
+                                            {Math.round(restaurant.discount_percentage)}% OFF
+                                        </span>
+                                    </div>
+                                )}
+
                                 {/* Overlay Actions */}
                                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-20">
                                     <button

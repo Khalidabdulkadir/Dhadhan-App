@@ -1,8 +1,9 @@
-import api, { BASE_URL } from '@/constants/api';
+import api from '@/constants/api';
+import { getImageUrl } from '@/utils/image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, BadgeCheck } from 'lucide-react-native';
+import { ArrowLeft, BadgeCheck, Search } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function RestaurantListScreen() {
@@ -12,6 +13,7 @@ export default function RestaurantListScreen() {
 
     const [loading, setLoading] = useState(true);
     const [restaurants, setRestaurants] = useState<any[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetchRestaurants();
@@ -33,17 +35,17 @@ export default function RestaurantListScreen() {
             }
             setRestaurants(filtered);
         } catch (error) {
-            console.error(error);
+            // Error fetching
         } finally {
             setLoading(false);
         }
     };
 
-    const getImageUrl = (url: string) => {
-        if (!url) return 'https://via.placeholder.com/150';
-        if (url.startsWith('http')) return url;
-        return `${BASE_URL}${url}`;
-    };
+
+
+    const filteredRestaurants = restaurants.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const renderRestaurant = ({ item }: { item: any }) => (
         <TouchableOpacity
@@ -79,11 +81,12 @@ export default function RestaurantListScreen() {
     const getTitle = () => {
         if (type === 'verified') return 'Verified Brands';
         if (type === 'popular') return 'Top Brands';
+        if (type === 'all') return 'All Restaurants';
         return 'Restaurants';
     };
 
     return (
-        <View style={[styles.container, { paddingTop: insets.top }]}>
+        <View style={styles.container}>
             <Stack.Screen options={{ headerShown: false }} />
 
             {/* Header */}
@@ -92,7 +95,17 @@ export default function RestaurantListScreen() {
                     <ArrowLeft size={24} color="#000" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>{getTitle()}</Text>
-                <View style={{ width: 40 }} />
+            </View>
+
+            <View style={styles.searchContainer}>
+                <Search size={20} color="#6B7280" />
+                <TextInput
+                    placeholder="Search restaurants..."
+                    style={styles.searchInput}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    placeholderTextColor="#9CA3AF"
+                />
             </View>
 
             {loading ? (
@@ -101,7 +114,7 @@ export default function RestaurantListScreen() {
                 </View>
             ) : (
                 <FlatList
-                    data={restaurants}
+                    data={filteredRestaurants}
                     renderItem={renderRestaurant}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.listContent}
@@ -141,6 +154,26 @@ const styles = StyleSheet.create({
     backBtn: {
         padding: 4,
     },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginHorizontal: 16,
+        marginVertical: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        backgroundColor: '#FFF',
+        borderRadius: 25,
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: 10,
+        fontSize: 14,
+        color: '#1F2937',
+        fontFamily: Platform.select({ ios: 'System', android: 'Roboto' }),
+        paddingVertical: 0,
+    },
     headerTitle: {
         fontSize: 18,
         fontWeight: '700',
@@ -153,21 +186,18 @@ const styles = StyleSheet.create({
 
     // Card Styles
     card: {
+        flexDirection: 'row', // Horizontal
         backgroundColor: '#FFF',
-        borderRadius: 16,
-        marginBottom: 16,
+        borderRadius: 12,
+        marginBottom: 12,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: '#F3F4F6',
-        // Shadow
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
+        height: 100, // Fixed compact height
     },
     imageContainer: {
-        height: 160,
+        width: 100, // Square image on left
+        height: '100%',
         backgroundColor: '#F3F4F6',
         position: 'relative',
     },
@@ -191,7 +221,9 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     info: {
-        padding: 16,
+        flex: 1, // Take remaining space
+        padding: 10,
+        justifyContent: 'center',
     },
     headerRow: {
         flexDirection: 'row',

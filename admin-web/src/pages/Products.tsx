@@ -16,6 +16,7 @@ interface Product {
     restaurant: number | null;
     restaurant_data?: { id: number; name: string };
     discount_percentage: number;
+    discounted_price?: number;
     is_promoted: boolean;
 }
 
@@ -275,13 +276,19 @@ export default function Products() {
                                 )}
 
                                 {/* Status Badge */}
-                                <div className="absolute top-4 left-4 z-20">
-                                    <span className={`px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm backdrop-blur-md ${product.is_available
+                                <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+                                    <span className={`px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm backdrop-blur-md w-fit ${product.is_available
                                         ? 'bg-green-500/90 text-white'
                                         : 'bg-red-500/90 text-white'
                                         }`}>
                                         {product.is_available ? 'Available' : 'Out of Stock'}
                                     </span>
+                                    {/* Discount Badge */}
+                                    {Number(product.discount_percentage) > 0 && (
+                                        <span className="bg-orange-500/90 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm backdrop-blur-md w-fit">
+                                            {Math.round(product.discount_percentage)}% OFF
+                                        </span>
+                                    )}
                                 </div>
 
                                 {/* Overlay Actions */}
@@ -305,8 +312,15 @@ export default function Products() {
                                 </div>
 
                                 {/* Price Tag */}
-                                <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg font-bold text-gray-900 border border-gray-100">
-                                    KSh {product.price}
+                                <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg font-bold text-gray-900 border border-gray-100 flex flex-col items-end">
+                                    {Number(product.discount_percentage) > 0 ? (
+                                        <>
+                                            <span className="text-orange-600 text-lg">KSh {Math.round(Number(product.discounted_price || product.price))}</span>
+                                            <span className="text-gray-400 text-xs line-through">KSh {product.price}</span>
+                                        </>
+                                    ) : (
+                                        <span>KSh {product.price}</span>
+                                    )}
                                 </div>
                             </div>
 

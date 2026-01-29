@@ -1,6 +1,7 @@
 
-import { BASE_URL } from '@/constants/api';
 import { CartItem, useCartStore } from '@/store/useCartStore';
+import { logOrderClick } from '@/utils/analytics';
+import { getImageUrl } from '@/utils/image';
 import { useRouter } from 'expo-router';
 import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react-native';
 import React from 'react';
@@ -14,34 +15,28 @@ export default function CartScreen() {
     const deliveryFee = items.reduce((acc, item) => acc + (Number(item.shipping_fee) || 0), 0);
     const total = subtotal + deliveryFee;
 
-    const getImageUrl = (url: string) => {
-        if (!url) return 'https://via.placeholder.com/150';
-        if (url.startsWith('http')) return url;
-        return `${BASE_URL}${url}`;
-    };
-
     const renderItem = ({ item }: { item: CartItem }) => (
         <View style={styles.cartItem}>
             <Image source={{ uri: getImageUrl(item.image) }} style={styles.itemImage} />
             <View style={styles.itemContent}>
-                <View style={styles.itemInfo}>
+                <View>
                     <Text style={styles.restaurantNameSmall}>{item.restaurant_data?.name}</Text>
-                    <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
-                    <Text style={styles.itemPrice}>KSh {Number(item.price).toFixed(2)}</Text>
+                    <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
+                    <Text style={styles.itemPrice}>KSh {Number(item.price).toFixed(0)}</Text>
                 </View>
 
-                <View style={styles.actionsRow}>
+                <View style={styles.actionsContainer}>
                     <View style={styles.quantityControl}>
                         <TouchableOpacity onPress={() => decrementQuantity(item.id)} style={styles.qtyButton}>
-                            <Minus size={16} color="#333" />
+                            <Minus size={14} color="#111" />
                         </TouchableOpacity>
                         <Text style={styles.qtyText}>{item.quantity}</Text>
                         <TouchableOpacity onPress={() => incrementQuantity(item.id)} style={styles.qtyButton}>
-                            <Plus size={16} color="#333" />
+                            <Plus size={14} color="#111" />
                         </TouchableOpacity>
                     </View>
                     <TouchableOpacity onPress={() => removeItem(item.id)} style={styles.removeButton}>
-                        <Trash2 size={18} color="#FF4500" />
+                        <Trash2 size={16} color="#EF4444" />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -63,24 +58,36 @@ export default function CartScreen() {
         );
     }
 
-    const handleCheckout = () => {
+    const handleCheckout = async () => {
         if (items.length === 0) return;
 
         const restaurant = items[0].restaurant_data; // Assume single restaurant for now
+
+        // Track Checkout Click
+        if (restaurant) {
+            await logOrderClick(restaurant.id, {
+                total_amount: total,
+                item_count: items.length,
+                restaurant_name: restaurant.name
+            });
+        }
         if (!restaurant || !restaurant.whatsapp_number) {
             alert("Restaurant contact info not found. Please contact support.");
             return;
         }
 
-        let message = `Hello ${restaurant.name}, I would like to place an order:%0A%0A`;
+        // Clean phone number: remove '+' and any non-digit chars
+        const phoneNumber = restaurant.whatsapp_number.replace(/[^\d]/g, '');
+
+        let message = `Hello ${restaurant.name}, I would like to place an order:\n\n`;
         items.forEach(item => {
-            message += `${item.quantity}x ${item.name} - KSh ${item.price}%0A`;
+            message += `${item.quantity}x ${item.name} - KSh ${item.price}\n`;
         });
-        message += `%0A*Subtotal:* KSh ${subtotal.toFixed(2)}`;
-        message += `%0A*Delivery Fee:* KSh ${deliveryFee.toFixed(2)}`;
-        message += `%0A*TOTAL:* KSh ${total.toFixed(2)}`;
-        message += `%0A%0AMy Delivery Location: Nairobi (Please ask for exact pin)`;
-        message += `%0A%0APaying via: `;
+        message += `\n*Subtotal:* KSh ${subtotal.toFixed(2)}`;
+        message += `\n*Delivery Fee:* KSh ${deliveryFee.toFixed(2)}`;
+        message += `\n*TOTAL:* KSh ${total.toFixed(2)}`;
+        message += `\n\nMy Delivery Location: Nairobi (Please ask for exact pin)`;
+        message += `\n\nPaying via: `;
         if (restaurant.till_number) {
             message += `Till Number ${restaurant.till_number}`;
         } else if (restaurant.paybill_number) {
@@ -89,15 +96,20 @@ export default function CartScreen() {
             message += `M-Pesa Number ${restaurant.whatsapp_number}`;
         }
 
-        const url = `whatsapp://send?phone=${restaurant.whatsapp_number}&text=${message}`;
+        // Use standard web intent which handles both app and web
+        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
-        Linking.canOpenURL(url).then(supported => {
+        try {
+            const supported = await Linking.canOpenURL(url);
             if (supported) {
-                Linking.openURL(url);
+                await Linking.openURL(url);
             } else {
-                alert("WhatsApp is not installed on this device");
+                // Fallback for some Android versions or if Link handling fails, just try opening it
+                await Linking.openURL(url);
             }
-        });
+        } catch (err) {
+            alert("Could not open WhatsApp. Please ensure it is installed.");
+        }
     };
 
     const handleCallOrder = () => {
@@ -120,10 +132,7 @@ export default function CartScreen() {
                 <View style={styles.paymentInfo}>
                     <Text style={styles.paymentHeader}>Payment Details:</Text>
 
-                    {/* M-Pesa */}
-                    {restaurantNumber && (
-                        <Text style={styles.paymentInfoText}>M-Pesa: <Text style={styles.paymentPhone}>{restaurantNumber}</Text></Text>
-                    )}
+
 
                     {/* Paybill */}
                     {restaurant?.paybill_number && (
@@ -166,33 +175,34 @@ export default function CartScreen() {
                 <View style={styles.summaryContainer}>
                     <View style={styles.summaryRow}>
                         <Text style={styles.summaryLabel}>Subtotal</Text>
-                        <Text style={styles.summaryValue}>KSh {subtotal.toFixed(2)}</Text>
+                        <Text style={styles.summaryValue}>KSh {subtotal.toFixed(0)}</Text>
                     </View>
                     <View style={styles.summaryRow}>
                         <Text style={styles.summaryLabel}>Delivery Fee</Text>
                         {deliveryFee > 0 ? (
-                            <Text style={styles.summaryValue}>KSh {deliveryFee.toFixed(2)}</Text>
+                            <Text style={styles.summaryValue}>KSh {deliveryFee.toFixed(0)}</Text>
                         ) : (
-                            <Text style={[styles.summaryValue, { color: '#059669' }]}>Free</Text>
+                            <Text style={[styles.summaryValue, { color: '#10B981' }]}>Free</Text>
                         )}
                     </View>
                     <View style={styles.divider} />
                     <View style={styles.totalRow}>
                         <Text style={styles.totalLabel}>Total</Text>
-                        <Text style={styles.totalValue}>KSh {total.toFixed(2)}</Text>
+                        <Text style={styles.totalValue}>KSh {total.toFixed(0)}</Text>
                     </View>
                 </View>
 
                 <View style={{ gap: 12 }}>
-                    <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
+                    <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout} activeOpacity={0.9}>
                         <Text style={styles.checkoutButtonText}>Order via WhatsApp</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={[styles.checkoutButton, { backgroundColor: '#FFF', borderWidth: 2, borderColor: '#FF4500' }]}
+                        style={styles.callButton}
                         onPress={handleCallOrder}
+                        activeOpacity={0.8}
                     >
-                        <Text style={[styles.checkoutButtonText, { color: '#FF4500' }]}>Call to Order</Text>
+                        <Text style={styles.callButtonText}>Call to Order</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -268,71 +278,74 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingHorizontal: 20,
-        paddingVertical: 15,
+        paddingTop: 20,
+        paddingBottom: 10,
         backgroundColor: '#F8F9FA',
     },
     headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#1F2937',
+        fontSize: 32,
+        fontWeight: '800',
+        color: '#111',
+        letterSpacing: -0.5,
     },
     listContent: {
-        padding: 20,
+        paddingHorizontal: 20,
+        paddingTop: 10,
+        paddingBottom: 180, // Increased space for floating footer + payment info
     },
     cartItem: {
         flexDirection: 'row',
         backgroundColor: '#FFF',
-        borderRadius: 20,
+        borderRadius: 16,
         padding: 12,
-        marginBottom: 15,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 3,
+        marginBottom: 16,
+        borderColor: '#F3F4F6',
+        borderWidth: 1,
+        // No Shadow -> Flat Design
     },
     itemImage: {
-        width: 90,
-        height: 90,
-        borderRadius: 15,
+        width: 80,
+        height: 80,
+        borderRadius: 12,
+        backgroundColor: '#F3F4F6',
     },
     itemContent: {
         flex: 1,
-        marginLeft: 15,
+        marginLeft: 14,
         justifyContent: 'space-between',
-        paddingVertical: 5,
-    },
-    itemInfo: {
-        marginBottom: 8,
     },
     restaurantNameSmall: {
-        fontSize: 12,
-        color: '#6B7280',
+        fontSize: 11,
+        color: '#9CA3AF',
         fontWeight: '600',
         marginBottom: 2,
+        textTransform: 'uppercase',
     },
     itemName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#1F2937',
         marginBottom: 4,
+        lineHeight: 20,
     },
     itemPrice: {
         fontSize: 15,
-        fontWeight: "600",
+        fontWeight: "700",
         color: '#FF4500',
     },
-    actionsRow: {
+    actionsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginTop: 8,
     },
     quantityControl: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F5F5F5',
-        borderRadius: 20,
-        padding: 4,
+        backgroundColor: '#F3F4F6',
+        borderRadius: 24,
+        paddingHorizontal: 4,
+        paddingVertical: 4,
     },
     qtyButton: {
         width: 28,
@@ -341,28 +354,39 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FFF',
         borderRadius: 14,
+        // Small shadow for button
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
         elevation: 1,
     },
     qtyText: {
-        marginHorizontal: 12,
-        fontWeight: 'bold',
+        width: 24,
+        textAlign: 'center',
+        fontWeight: '700',
         fontSize: 14,
+        color: '#111',
     },
     removeButton: {
-        padding: 8,
-        backgroundColor: '#FFF0EB',
-        borderRadius: 12,
+        padding: 6,
     },
     footer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
         backgroundColor: '#FFF',
-        padding: 25,
-        borderTopLeftRadius: 35,
-        borderTopRightRadius: 35,
+        paddingHorizontal: 24,
+        paddingTop: 20,
+        paddingBottom: 30, // Safe area
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
         elevation: 20,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: -5 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
+        shadowOffset: { width: 0, height: -8 },
+        shadowOpacity: 0.08,
+        shadowRadius: 16,
     },
     summaryContainer: {
         marginBottom: 20,
@@ -370,11 +394,12 @@ const styles = StyleSheet.create({
     summaryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 12,
+        marginBottom: 10,
     },
     summaryLabel: {
         color: '#6B7280',
         fontSize: 15,
+        fontWeight: '500',
     },
     summaryValue: {
         color: '#1F2937',
@@ -384,38 +409,51 @@ const styles = StyleSheet.create({
     divider: {
         height: 1,
         backgroundColor: '#F3F4F6',
-        marginVertical: 10,
+        marginVertical: 12,
     },
     totalRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 5,
+        marginTop: 0,
     },
     totalLabel: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#1F2937',
+        fontSize: 18,
+        fontWeight: '800',
+        color: '#111',
     },
     totalValue: {
         fontSize: 22,
-        fontWeight: 'bold',
+        fontWeight: '800',
         color: '#FF4500',
     },
     checkoutButton: {
         backgroundColor: '#FF4500',
         paddingVertical: 18,
-        borderRadius: 30,
+        borderRadius: 100, // Pill shape
         alignItems: 'center',
-        elevation: 5,
+        elevation: 4,
         shadowColor: '#FF4500',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
+        shadowOpacity: 0.25,
+        shadowRadius: 8,
     },
     checkoutButtonText: {
         color: '#FFF',
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 17,
+        fontWeight: '700',
+    },
+    callButton: {
+        backgroundColor: '#FFF',
+        paddingVertical: 16,
+        borderRadius: 100,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+    },
+    callButtonText: {
+        color: '#4B5563',
+        fontSize: 16,
+        fontWeight: '600',
     },
     paymentHeader: {
         fontSize: 14,

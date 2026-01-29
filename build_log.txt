@@ -1,0 +1,355 @@
+★ eas-cli@16.28.0 is now available.
+To upgrade, run:
+npm install -g eas-cli
+Proceeding with outdated version.
+
+Resolved "preview" environment for the build. Learn more: https://docs.expo.dev/eas/environment-variables/#setting-the-environment-for-your-builds
+No environment variables with visibility "Plain text" and "Sensitive" found for the "preview" environment on EAS.
+
+Specified value for "android.package" in app.json is ignored because an android directory was detected in the project.
+EAS Build will use the value found in the native code.
+✔ Using remote Android credentials (Expo server)
+✔ Using Keystore from configuration: Build Credentials g4F4xLT-6q (default)
+⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files⠦ Compressing project files⠧ Compressing project files⠇ Compressing project files⠏ Compressing project files⠋ Compressing project files⠙ Compressing project files⠹ Compressing project files⠸ Compressing project files⠼ Compressing project files⠴ Compressing project files✔ Compressed project files 30s (278 MB)
+⠋ Computing project fingerprint⠙ Computing project fingerprint⠹ Computing project fingerprint⠸ Computing project fingerprint⠼ Computing project fingerprint⠴ Computing project fingerprint⠦ Computing project fingerprint⠧ Computing project fingerprint⠇ Computing project fingerprint⠏ Computing project fingerprint⠋ Computing project fingerprint⠙ Computing project fingerprint⠹ Computing project fingerprint⠸ Computing project fingerprint⠼ Computing project fingerprint⠴ Computing project fingerprint⠦ Computing project fingerprint⠧ Computing project fingerprint⠇ Computing project fingerprint⠏ Computing project fingerprint⠋ Computing project fingerprint⠙ Computing project fingerprint⠹ Computing project fingerprint⠸ Computing project fingerprint⠼ Computing project fingerprint⠴ Computing project fingerprint⠦ Computing project fingerprint⠧ Computing project fingerprint⠇ Computing project fingerprint⠏ Computing project fingerprint⠋ Computing project fingerprint⠙ Computing project fingerprint⠹ Computing project fingerprint⠸ Computing project fingerprint⠼ Computing project fingerprint⠴ Computing project fingerprint⠦ Computing project fingerprint⠧ Computing project fingerprint⠇ Computing project fingerprint⠏ Computing project fingerprint⠋ Computing project fingerprint⠙ Computing project fingerprint⠹ Computing project fingerprint⠸ Computing project fingerprint⠼ Computing project fingerprint⠴ Computing project fingerprint⠦ Computing project fingerprint⠧ Computing project fingerprint⠇ Computing project fingerprint⠏ Computing project fingerprint⠋ Computing project fingerprint⠙ Computing project fingerprint⠹ Computing project fingerprint⠸ Computing project fingerprint⠼ Computing project fingerprint⠴ Computing project fingerprint⠦ Computing project fingerprint⠧ Computing project fingerprint⠇ Computing project fingerprint⠏ Computing project fingerprint⌛️ Computing the project fingerprint is taking longer than expected...
+⠋ Computing project fingerprint⏩ To skip this step, set the environment variable: EAS_SKIP_AUTO_FINGERPRINT=1
+⠋ Computing project fingerprint⠙ Computing project fingerprint⠹ Computing project fingerprint⠸ Computing project fingerprint⠼ Computing project fingerprint✔ Computed project fingerprint
+ANDROID_NDK_HOME environment variable was not specified, continuing build without NDK
+[SETUP_WORKINGDIR] Preparing workingdir /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b
+[START_BUILD] Starting build
+  "job": {
+    "type": "generic",
+    "platform": "android",
+    "projectRootDirectory": ".",
+    "projectArchive": {
+      "type": "PATH",
+      "path": "/tmp/khalid-abdulkadir/eas-cli-nodejs/3ad581e3-9e62-4664-bae7-2d1b3c6569c9.tar.gz"
+    },
+    "builderEnvironment": {
+      "env": {}
+    },
+    "cache": {
+      "disabled": false,
+      "paths": [],
+      "clear": true
+    },
+    "updates": {},
+    "buildType": "apk",
+    "username": "khalidabdulkadirdiriye",
+    "version": {
+      "versionCode": "15"
+    },
+    "experimental": {},
+    "mode": "build",
+    "triggeredBy": "EAS_CLI",
+    "appId": "51ae0105-f201-4034-beff-9e0ef4a4dd3b",
+    "initiatingUserId": "4ae0456b-f5b3-49d9-83bd-2aaf0e4be517"
+  }
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.dev'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.ino'
+[PREPARE_PROJECT] tar: Ignoring unknown extended header keyword 'SCHILY.nlink'
+[PREPARE_PROJECT] .npmrc found at .npmrc
+[READ_PACKAGE_JSON] Using package.json:
+[READ_PACKAGE_JSON] {
+  "name": "matrix-restaurant",
+  "main": "expo-router/entry",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^15.0.3",
+    "@react-native-firebase/analytics": "^23.8.2",
+    "@react-native-firebase/app": "^23.8.2",
+    "@react-navigation/native": "^7.1.8",
+    "axios": "^1.13.2",
+    "expo": "~54.0.29",
+    "expo-application": "~7.0.8",
+    "expo-auth-session": "~7.0.10",
+    "expo-av": "~16.0.8",
+    "expo-build-properties": "~1.0.10",
+    "expo-constants": "~18.0.12",
+    "expo-crypto": "~15.0.8",
+    "expo-font": "~14.0.10",
+    "expo-linear-gradient": "~15.0.8",
+    "expo-linking": "~8.0.10",
+    "expo-router": "~6.0.19",
+    "expo-secure-store": "^15.0.8",
+    "expo-splash-screen": "~31.0.12",
+    "expo-status-bar": "~3.0.9",
+    "expo-web-browser": "~15.0.10",
+    "lucide-react-native": "^0.561.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-reanimated": "~4.1.1",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1",
+    "react-native-web": "~0.21.0",
+    "react-native-worklets-core": "^1.6.2",
+    "semver": "^7.7.3",
+    "zustand": "^5.0.9"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.10",
+    "react-test-renderer": "19.1.0",
+    "typescript": "~5.9.2"
+  },
+  "private": true
+}
+[INSTALL_DEPENDENCIES] Running "npm install" in /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build directory
+[INSTALL_DEPENDENCIES] npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+[INSTALL_DEPENDENCIES] npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+[INSTALL_DEPENDENCIES] npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+[INSTALL_DEPENDENCIES] npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+[INSTALL_DEPENDENCIES] npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+[INSTALL_DEPENDENCIES] npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+[INSTALL_DEPENDENCIES] added 825 packages, and audited 826 packages in 23s
+[INSTALL_DEPENDENCIES] 74 packages are looking for funding
+[INSTALL_DEPENDENCIES]   run `npm fund` for details
+[INSTALL_DEPENDENCIES] found 0 vulnerabilities
+The NODE_ENV environment variable is required but was not specified. Ensure the project is bundled with Expo CLI or NODE_ENV is set.
+Proceeding without mode-specific .env
+[READ_APP_CONFIG] Using app configuration:
+[READ_APP_CONFIG] {
+  "name": "Dhadhan",
+  "slug": "matrix-restaurant",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "icon": "./assets/images/icon.png",
+  "scheme": "matrixrestaurant",
+  "userInterfaceStyle": "automatic",
+  "newArchEnabled": false,
+  "splash": {
+    "image": "./assets/images/splash_safe.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#ffffff"
+  },
+  "ios": {
+    "supportsTablet": true,
+    "bundleIdentifier": "com.matrix.restaurant"
+  },
+  "android": {
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/images/adaptive-icon.png",
+      "backgroundColor": "#ffffff"
+    },
+    "edgeToEdgeEnabled": true,
+    "predictiveBackGestureEnabled": false,
+    "package": "com.matrix.restaurant",
+    "blockedPermissions": [
+      "android.permission.RECORD_AUDIO"
+    ],
+    "statusBar": {
+      "hidden": false,
+      "translucent": true
+    },
+    "intentFilters": [
+      {
+        "action": "VIEW",
+        "data": {
+          "scheme": "whatsapp"
+        }
+      }
+    ],
+    "googleServicesFile": "./google-services.json"
+  },
+  "web": {
+    "bundler": "metro",
+    "output": "static",
+    "favicon": "./assets/images/favicon.png"
+  },
+  "plugins": [
+    "expo-router",
+    [
+      "expo-build-properties",
+      {
+        "android": {
+          "usesCleartextTraffic": true
+        }
+      }
+    ]
+  ],
+  "experiments": {
+    "typedRoutes": true
+  },
+  "extra": {
+    "router": {},
+    "eas": {
+      "projectId": "51ae0105-f201-4034-beff-9e0ef4a4dd3b"
+    }
+  },
+  "owner": "khalidabdulkadirdiriye",
+  "sdkVersion": "54.0.0",
+  "platforms": [
+    "ios",
+    "android",
+    "web"
+  ]
+}
+[RUN_EXPO_DOCTOR] Running "expo doctor"
+[RUN_EXPO_DOCTOR] Running 17 checks on your project...
+[RUN_EXPO_DOCTOR] 14/17 checks passed. 3 checks failed. Possible issues detected:
+[RUN_EXPO_DOCTOR] Use the --verbose flag to see more details about passed checks.
+[RUN_EXPO_DOCTOR] 
+[RUN_EXPO_DOCTOR] ✖ Check Expo config (app.json/ app.config.js) schema
+[RUN_EXPO_DOCTOR] Error validating fields in /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/app.json:
+[RUN_EXPO_DOCTOR]  Field: android - should NOT have additional property 'statusBar'.
+[RUN_EXPO_DOCTOR] Error validating asset fields in /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/app.json:
+[RUN_EXPO_DOCTOR]  Field: Android.adaptiveIcon.foregroundImage - the file extension should match the content, but the file extension is .png while the file content at './assets/images/adaptive-icon.png' is of type jpg.
+[RUN_EXPO_DOCTOR]  Field: Android.adaptiveIcon.foregroundImage - field 'Android.adaptiveIcon.foregroundImage' should point to .png image but the file at './assets/images/adaptive-icon.png' has type jpg.
+[RUN_EXPO_DOCTOR]  Field: Splash.image - the file extension should match the content, but the file extension is .png while the file content at './assets/images/splash_safe.png' is of type jpg.
+[RUN_EXPO_DOCTOR]  Field: Splash.image - field 'Splash.image' should point to .png image but the file at './assets/images/splash_safe.png' has type jpg.
+[RUN_EXPO_DOCTOR]  Field: icon - the file extension should match the content, but the file extension is .png while the file content at './assets/images/icon.png' is of type jpg.
+[RUN_EXPO_DOCTOR]  Field: icon - field 'icon' should point to .png image but the file at './assets/images/icon.png' has type jpg.
+[RUN_EXPO_DOCTOR] Advice:
+[RUN_EXPO_DOCTOR] Resolve schema errors in your app config. Learn more: https://docs.expo.dev/workflow/configuration/
+[RUN_EXPO_DOCTOR] 
+[RUN_EXPO_DOCTOR] ✖ Check that required peer dependencies are installed
+[RUN_EXPO_DOCTOR] Missing peer dependency: react-native-worklets
+[RUN_EXPO_DOCTOR] Required by: react-native-reanimated
+[RUN_EXPO_DOCTOR] Advice:
+[RUN_EXPO_DOCTOR] Install missing required peer dependency with "npx expo install react-native-worklets"
+[RUN_EXPO_DOCTOR] Your app may crash outside of Expo Go without this dependency. Native module peer dependencies must be installed directly.
+[RUN_EXPO_DOCTOR] 
+[RUN_EXPO_DOCTOR] ✖ Check for app config fields that may not be synced in a non-CNG project
+[RUN_EXPO_DOCTOR] This project contains native project folders but also has native configuration properties in app.json, indicating it is configured to use Prebuild. When the android/ios folders are present, EAS Build will not sync the following properties: orientation, icon, scheme, userInterfaceStyle, splash, ios, android, plugins.
+[RUN_EXPO_DOCTOR] Advice:
+[RUN_EXPO_DOCTOR] Add '/android' to your .easignore file if you intend to use CNG / Prebuild. Learn more: https://docs.expo.dev/workflow/prebuild/#usage-with-eas-build
+[RUN_EXPO_DOCTOR] If you intend to not use CNG, add '/android/.gradle' to your .easignore to avoid committing Gradle caches
+[RUN_EXPO_DOCTOR] 3 checks failed, indicating possible issues with the project.
+[RUN_EXPO_DOCTOR] Command "expo doctor" failed.
+Error: npx -y expo-doctor exited with non-zero code: 1
+    at ChildProcess.completionListener (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/spawn-async/build/spawnAsync.js:42:23)
+    at Object.onceWrapper (node:events:639:26)
+    at ChildProcess.emit (node:events:524:28)
+    at maybeClose (node:internal/child_process:1104:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+    ...
+    at spawnAsync (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/spawn-async/build/spawnAsync.js:7:23)
+    at spawn (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/turtle-spawn/dist/index.js:16:47)
+    at runExpoDoctor (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/common/setup.js:110:52)
+    at async /home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/common/setup.js:88:17
+    at async BuildContext.runBuildPhase (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/context.js:121:28)
+    at async setupAsync (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/common/setup.js:86:9)
+    at async buildAsync (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/builders/android.js:39:5)
+    at async runBuilderWithHooksAsync (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/builders/common.js:12:13)
+    at async Object.androidBuilder (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/builders/android.js:25:16)
+    at async buildAndroidAsync (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/eas-cli-local-build-plugin/dist/android.js:44:12)
+[PREBUILD] Skipped running "expo prebuild" because the "android" directory already exists. Learn more about the build process: https://docs.expo.dev/build-reference/android-builds/
+[PREPARE_CREDENTIALS] Writing secrets to the project's directory
+[PREPARE_CREDENTIALS] Injecting signing config into build.gradle
+[EAGER_BUNDLE] Starting Metro Bundler
+[EAGER_BUNDLE] Android Bundling failed 503ms node_modules/expo-router/entry.js (1 module)
+[EAGER_BUNDLE] SyntaxError: node_modules/expo-router/entry.js: [BABEL]: Cannot find module 'react-native-worklets/plugin'
+[EAGER_BUNDLE] Require stack:
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/react-native-reanimated/plugin/index.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@babel/core/lib/config/files/module-types.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@babel/core/lib/config/files/configuration.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@babel/core/lib/config/files/index.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@babel/core/lib/index.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@expo/metro-config/build/transform-worker/metro-transform-worker.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@expo/metro-config/build/transform-worker/transform-worker.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/metro/src/DeltaBundler/Worker.flow.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/metro/src/DeltaBundler/Worker.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/jest-worker/build/workers/processChild.js (While processing: /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/react-native-reanimated/plugin/index.js)
+[EAGER_BUNDLE] Error: [BABEL]: Cannot find module 'react-native-worklets/plugin'
+[EAGER_BUNDLE] Require stack:
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/react-native-reanimated/plugin/index.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@babel/core/lib/config/files/module-types.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@babel/core/lib/config/files/configuration.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@babel/core/lib/config/files/index.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@babel/core/lib/index.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@expo/metro-config/build/transform-worker/metro-transform-worker.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/@expo/metro-config/build/transform-worker/transform-worker.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/metro/src/DeltaBundler/Worker.flow.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/metro/src/DeltaBundler/Worker.js
+[EAGER_BUNDLE] - /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/jest-worker/build/workers/processChild.js (While processing: /tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/react-native-reanimated/plugin/index.js)
+[EAGER_BUNDLE]     at Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)
+[EAGER_BUNDLE]     at Module._load (node:internal/modules/cjs/loader:1038:27)
+[EAGER_BUNDLE]     at Module.require (node:internal/modules/cjs/loader:1289:19)
+[EAGER_BUNDLE]     at require (node:internal/modules/helpers:182:18)
+[EAGER_BUNDLE]     at Object.<anonymous> (/tmp/khalid-abdulkadir/eas-build-local-nodejs/b7d1bc47-cc3b-4037-8a1b-b43f1054527b/build/node_modules/react-native-reanimated/plugin/index.js:2:16)
+[EAGER_BUNDLE]     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+[EAGER_BUNDLE]     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+[EAGER_BUNDLE]     at Module.load (node:internal/modules/cjs/loader:1266:32)
+[EAGER_BUNDLE]     at Module._load (node:internal/modules/cjs/loader:1091:12)
+[EAGER_BUNDLE]     at Module.require (node:internal/modules/cjs/loader:1289:19)
+[EAGER_BUNDLE] 
+Error: npx expo export:embed --eager --platform android --dev false exited with non-zero code: 1
+    at ChildProcess.completionListener (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/spawn-async/build/spawnAsync.js:42:23)
+    at Object.onceWrapper (node:events:639:26)
+    at ChildProcess.emit (node:events:524:28)
+    at maybeClose (node:internal/child_process:1104:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+    ...
+    at spawnAsync (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/spawn-async/build/spawnAsync.js:7:23)
+    at spawn (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/turtle-spawn/dist/index.js:16:47)
+    at runExpoCliCommand (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/utils/project.js:23:43)
+    at eagerBundleAsync (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/common/eagerBundle.js:10:43)
+    at /home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/builders/android.js:92:54
+    at BuildContext.runBuildPhase (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/context.js:121:34)
+    at buildAsync (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/builders/android.js:91:19)
+    at async runBuilderWithHooksAsync (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/builders/common.js:12:13)
+    at async Object.androidBuilder (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/@expo/build-tools/dist/builders/android.js:25:16)
+    at async buildAndroidAsync (/home/khalid-abdulkadir/.npm/_npx/a4ff5c16beb6b833/node_modules/eas-cli-local-build-plugin/dist/android.js:44:12)
+
+Build failed
+Unknown error. See logs of the Bundle JavaScript build phase for more information.
+npx -y eas-cli-local-build-plugin@1.0.171 eyJqb2IiOnsidHlwZSI6ImdlbmVyaWMiLCJwbGF0Zm9ybSI6ImFuZHJvaWQiLCJwcm9qZWN0Um9vdERpcmVjdG9yeSI6Ii4iLCJwcm9qZWN0QXJjaGl2ZSI6eyJ0eXBlIjoiUEFUSCIsInBhdGgiOiIvdG1wL2toYWxpZC1hYmR1bGthZGlyL2Vhcy1jbGktbm9kZWpzLzNhZDU4MWUzLTllNjItNDY2NC1iYWU3LTJkMWIzYzY1NjljOS50YXIuZ3oifSwiYnVpbGRlckVudmlyb25tZW50Ijp7ImVudiI6e319LCJjYWNoZSI6eyJkaXNhYmxlZCI6ZmFsc2UsInBhdGhzIjpbXSwiY2xlYXIiOnRydWV9LCJzZWNyZXRzIjp7ImJ1aWxkQ3JlZGVudGlhbHMiOnsia2V5c3RvcmUiOnsiZGF0YUJhc2U2NCI6Ii91Mys3UUFBQUFJQUFBQUJBQUFBQVFBZ05tTXlNV00xTldKalpqRTVaalUzTlRZeFpEZGlPVEl5TjJKaVl6RTFPR0lBQUFHYkZEV1cyQUFBQlA4d2dnVDdNQXdHQ2lzR0FRUUJLZ0lSQVFFRWdnVHBrSXR3NEc1azRGUUdUZjh4d0VzaGVvbFplem1EMWhOSTcrU3puK1NDcXhGNldVV3ZrNERlRGxveHFlMlpOd2NFUDBHTGdrMUdNU1AvaTN4N2w4M05Ta0oxajJqVmVCdisyZGZnR2FnN3ZqR215a1prd0FsVWJzRDFIdXk1ejNOeUVOakRFVVUzemJLMlpOWHluM3cvZlRlLzlDTHNQcVpxZU5LZ1RCN2ZocllCTmNDNmZCcnF1QUVWUVErY0Vtb2xKWGlJSElUUDFzemIxT050ZmJ3RVF1bnlMMEwxVFNmS2RPV3NrUkJjSUZxMUVvcmxVRmNzK3loZGxyU1FNdktadXEzL0NLNU1OSVFjUUtaSnM2dlRVYlVCdmM0V08zaWhrOExFUVlrYWNxVnJ1TklGZ1lXUWduejVacXY5ZzlUYWZ3c0htRXg0R3hKTVJJaThUYlh4Wlpyc2xFRFI5WjRPd3BEMC9QbTRiRjhOU051d0s5bThSRDEzMnpFM2NvUFdTRHVheWN3cW5lWnU1M2V4bzFOTExuekhVaEg0eXlickYwbjM4cWlVQ3ZTVzgvM0c0OFVCR1B2dEl5VndPb2Qxa1FtZWdQTkM1OHkxb1JzVXVWTTBENndkZXZuQThhbGVNVFZ3UGNqQVFCeGlSUXRUNmxkQ0VMK2c1dGUwQzB3M0tVMlpLWTRBdTdIMlFkUzRnMlRNc0w4Z0hUSjlhZVUzVnFLaG8xWUM0eTBkL0NsSjNvUXY3NDU0cG5PeHJPS3llaUt4RWFHejhVYUxPaE02RHkyam0yRlQ0dHNuZnd1SVRtQkNKU1BzcW9iVzJSR003VnJPRXpncFJ2YlJzU2ZOViszOXAycURWeVliQTFsdjFSUWJYQUlZbnhEQXRiODJUV3VQbjNsc2tjS1dlTGZMNkJ0NGdLRzFheUtRdHV3bWRhc1ZWWlJuUEE0cjdkbXB6N0E4UzZYakxMMFNFNTdhcmp2bTRsV3NsamE4TzczaDJKN1U2eS9ZZ20xTTllSjhrcVNYM1lqWE9UNDlHa0pNSlZHZ1JjMitQcWU1MDNnbnNySzZUSVVsQSt0K0h2V0d1MTZnS3RLZ0tlRVpOU3hDcTltbXM2aXdOR0hMOW1rN09JM1JMUVFKQkVFU210OHdNLzJZRDlMLzNvU3RibVBtMWUyaU90WXVQdG9tM0dTUGFGaWFOaEczSHEyeE9tUG5IblV4Mi9NbC9vdW82cng1U3dSeFFFeUFXdHJVOEx1RXltMDN1SENSQ0dyUTNvZWErekpwc2ZQa0ZkemEwaVhPY01GblZScWxFdnRreW11Z1pYSUhlK3BNNW1tYUhmclhkdmN6ZG41bUhCV2hsN0U3UytENWE1NjZSNnk0STJ4R1NDdXBZNllrbnhxQm5tNDNRWi9DMjhiQ20wZVFZcVlBQ1I3NWVPS2l0eWxCYVFWZWtQbGd0aUhKdnkvUWdVR2c2UUt2bTF2b3M3WnBiQnpTeWhZNmdTUkJhUi9ZcDk2bDFvVHJJZGo2UkNvVTB5RFlMSGVSTkhRTlgyejBwcnEzMVBNNWN1TGlzSncrU1FvN0t5UzZDOTROeUhCUjlZK0lMMVJ0TzRUc1h5dkNDOTZCbmk3ZU8yU25YbFUyeTg4NTB2bnhCUmpyamdBK1hVaXpObU9TZUxXS25DYUFzUkJPajBqZi9aMTN1YVNMaXQvWk9rL3pDTkp0Mk5iUGgzRHB0bkwwU21LRWVkUURNSnJDUW1wMnQwQ1NQR3owQ09HclRsV2hBc3hFenBnMXZHaC9ZS0l2VDRoUE5qMlZqVklDYUtEU1JDOUVzMWV4UXpMK3F3TUJ4MUIxRVFzTFU5ZGV4dXpiNEU0b2RYK0FEZ2ZrNXFTZHo5ckJGaWxDWFhRdFV1NlQxaEszYmppZ0Y5M1F0M3g1YWhqY0ptUGVVVXJVT0RIWFJGbThmY3hCc3VxYmhBaXlGS2c0cVR1MmpZaVc1ZEtnVWFNVzc1NmVTNFJBOTVpRmdVY0NSZVlyb2ppR3ByK1lHU1NCT0Vabi8yT3VqUE1LcHRtalZGUTJqN0doU0tpQ2s0djZzczhydmExTDNvejMwc1EwL29ycWdndi84TGFwcTEyMDdleWx4eG5ZSXlQTDVyNElpM3hSN3lBVXBtM0ZBZmxsMHdMdUtNU253dWtyODB0Tmw1dVNHYXFHVy9wajZLbG1sRFRFaFpBVGN5VmxUSTIzSHZjckFBQUFBUUFGV0M0MU1Ea0FBQU14TUlJRExUQ0NBaFdnQXdJQkFnSUlLczFlUVdKZ25Cd3dEUVlKS29aSWh2Y05BUUVNQlFBd1JERUxNQWtHQTFVRUJoTUNWVk14Q1RBSEJnTlZCQWdUQURFSk1BY0dBMVVFQnhNQU1Ra3dCd1lEVlFRS0V3QXhDVEFIQmdOVkJBc1RBREVKTUFjR0ExVUVBeE1BTUNBWERUSTFNVEl4TWpJd01UWTFORm9ZRHpJd05UTXdOREk1TWpBeE5qVTBXakJFTVFzd0NRWURWUVFHRXdKVlV6RUpNQWNHQTFVRUNCTUFNUWt3QndZRFZRUUhFd0F4Q1RBSEJnTlZCQW9UQURFSk1BY0dBMVVFQ3hNQU1Ra3dCd1lEVlFRREV3QXdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFEQ2s4N2dsQnZQWWJFQTUyNGlPRXdkdnIzalBvWXFqYlpRVFFvL3RLZTJkMGNXQUxjaHhCaFBaVXBWV2RmQ2VqdGZzb3U3M0VjV1E4THN5UWU2NGdjbldJRGpwVCtmaEM4WTYybUhJSVJVeU56bnd6T252Z1RCVlJ4dnhLSEVjcXk4alhQY2FDa2JsWW92VlpkRmxpTWt3M0hwZkRuRzl5a2dkR3U3VlJyem92TEduNTJHcDArWVZJTTZMcTVtRklkbTlHajhpZllEU3N6eDA3N0R3aURNSGo2MGlYaGFUZFJZaExSNnh3VVQ4NERNUGZ1dEtLMUMvRE1FS0dnT2MvdXAvcUg4eDFJV20xeDU2NmN4T0RrNE1ieExtUGtjMTc3VFA5M1dMdVUwZVcxVmNQSi9KZ2I0YldtbGltMVM2WXBydEgzWGhXWS9JaTZ1STNnL1p2elhBZ01CQUFHaklUQWZNQjBHQTFVZERnUVdCQlR4R09vMDJvK0NQSE5tUzZnRDBJaXhJQ0dVVVRBTkJna3Foa2lHOXcwQkFRd0ZBQU9DQVFFQUwzaDJQTEhEa1RESDlROUZsQ0xSaEh5UVdRR1p3MkZ5VWVpTldYM2s5WFZHVGFnVU51TzVQWEZiKzM5U0ZsWW9YNEVCQWp0SThycXpzQnJValZWZmpRY0k5ZVgrMFpaRWRDUmNWZWxZNDdQY1RKOHNiRWZPZSs4Z1JtaDZxcTh6VzNOVDI0Z05GNnE3c0xuWjYveWRMWXpaLzF3OC95UkYwdFdDTHZFalpvZDBtZnJBWk1lWDBkSGsvVkpXWHUwY0JRblQ3cGg4Ri85b3JBNDdVdHBOWTJjTVdYMUhsa0dzcytOWDBMZU5vRW1TaWdjUmNiNldMUXBoSVUwV1RyTVBObTR3KzYwSVY2dEtvZHFVZzl3RFQ5Y1k1ZEVRcDJpeTNWeXpzbENyOE1Qa0FoS0tXY0dVcmIwR3FaT01PMWJqZ2IwWUx2R1N6K28yWmVnbWt2amdjbUpYRGJBYVQzUzZBamRVdzdiMjRWMTc2OEIvIiwia2V5c3RvcmVQYXNzd29yZCI6IjBhODljMzVhNmI4YmYwYmFhYTY3ZWMwNjI5YmVmMWJmIiwia2V5QWxpYXMiOiI2YzIxYzU1YmNmMTlmNTc1NjFkN2I5MjI3YmJjMTU4YiIsImtleVBhc3N3b3JkIjoiYzM0NmNiODFkNzY5N2FmYjVjNDQyYmZjZGEzMjUyZjAifX19LCJ1cGRhdGVzIjp7fSwiYnVpbGRUeXBlIjoiYXBrIiwidXNlcm5hbWUiOiJraGFsaWRhYmR1bGthZGlyZGlyaXllIiwidmVyc2lvbiI6eyJ2ZXJzaW9uQ29kZSI6IjE1In0sImV4cGVyaW1lbnRhbCI6e30sIm1vZGUiOiJidWlsZCIsInRyaWdnZXJlZEJ5IjoiRUFTX0NMSSIsImFwcElkIjoiNTFhZTAxMDUtZjIwMS00MDM0LWJlZmYtOWUwZWY0YTRkZDNiIiwiaW5pdGlhdGluZ1VzZXJJZCI6IjRhZTA0NTZiLWY1YjMtNDlkOS04M2JkLTJhYWYwZTRiZTUxNyJ9LCJtZXRhZGF0YSI6eyJ0cmFja2luZ0NvbnRleHQiOnsidHJhY2tpbmdfaWQiOiJkZjAwODkxZC1kMzg2LTQwYzMtYjI0My00MWZiOWZkNjcxMWEiLCJwbGF0Zm9ybSI6ImFuZHJvaWQiLCJzZGtfdmVyc2lvbiI6IjU0LjAuMCIsImFjY291bnRfaWQiOiI3ZDgyMjE4OC05NWRmLTRkMGQtYjFiYS03MTBiMWUxMDcwNGIiLCJwcm9qZWN0X2lkIjoiNTFhZTAxMDUtZjIwMS00MDM0LWJlZmYtOWUwZWY0YTRkZDNiIiwicHJvamVjdF90eXBlIjoiZ2VuZXJpYyIsImRldl9jbGllbnQiOmZhbHNlLCJub193YWl0IjpmYWxzZSwicnVuX2Zyb21fY2kiOmZhbHNlLCJsb2NhbCI6dHJ1ZX0sImFwcFZlcnNpb24iOiIxLjAuMCIsImFwcEJ1aWxkVmVyc2lvbiI6IjE1IiwiY2xpVmVyc2lvbiI6IjE2LjE4LjAiLCJ3b3JrZmxvdyI6ImdlbmVyaWMiLCJjcmVkZW50aWFsc1NvdXJjZSI6InJlbW90ZSIsInNka1ZlcnNpb24iOiI1NC4wLjAiLCJmaW5nZXJwcmludEhhc2giOiIyMGFlYTNjYWQ3ZjZjMjQ1ZDM3MzMzODg5NjNiMWRjNGFiNmYzMjIyIiwiZmluZ2VycHJpbnRTb3VyY2UiOnsidHlwZSI6IlBBVEgiLCJwYXRoIjoiL3RtcC9raGFsaWQtYWJkdWxrYWRpci9lYXMtY2xpLW5vZGVqcy82YTNmZGEzZS0zY2Q1LTQ3N2UtYjc2Yy1iY2E5MDc4NzU0NjUtcnVudGltZS1maW5nZXJwcmludC5qc29uIiwiaXNEZWJ1Z0ZpbmdlcnByaW50IjpmYWxzZX0sInJlYWN0TmF0aXZlVmVyc2lvbiI6IjAuODEuNSIsImRpc3RyaWJ1dGlvbiI6ImludGVybmFsIiwiYXBwTmFtZSI6IkRoYWRoYW4iLCJhcHBJZGVudGlmaWVyIjoiY29tLm1hdHJpeC5yZXN0YXVyYW50IiwiYnVpbGRQcm9maWxlIjoicHJldmlldyIsImdpdENvbW1pdEhhc2giOiIyY2E2ZDVmNzdmNmVlNzQ0NGZjMDEwZGQwYjg3Njg3MTI3MjliMjZmIiwiZ2l0Q29tbWl0TWVzc2FnZSI6IkNvcnJlY3QgTGl2ZSBBUEkgVVJMIHRvIGh0dHBzOi8vZGhhZGhhbi1hcHAub25yZW5kZXIuY29tIiwiaXNHaXRXb3JraW5nVHJlZURpcnR5Ijp0cnVlLCJ1c2VybmFtZSI6ImtoYWxpZGFiZHVsa2FkaXJkaXJpeWUiLCJydW5XaXRoTm9XYWl0RmxhZyI6ZmFsc2UsInJ1bkZyb21DSSI6ZmFsc2UsImRldmVsb3BtZW50Q2xpZW50IjpmYWxzZSwicmVxdWlyZWRQYWNrYWdlTWFuYWdlciI6Im5wbSIsInNpbXVsYXRvciI6ZmFsc2V9fQ== exited with non-zero code: 1
+    Error: build command failed.

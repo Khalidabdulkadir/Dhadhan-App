@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Clapperboard, Search, ShoppingCart, Store, User, UtensilsCrossed } from 'lucide-react-native';
+import { Clapperboard, ShoppingCart, User, UtensilsCrossed } from 'lucide-react-native';
 import React from 'react';
 import { useColorScheme } from 'react-native';
 
@@ -19,38 +19,23 @@ export default function TabLayout() {
         tabBarStyle: {
           borderTopWidth: 0,
           elevation: 5,
-          height: 60 + (insets.bottom > 0 ? insets.bottom : 10),
-          paddingBottom: insets.bottom > 0 ? insets.bottom : 10,
+          height: 60 + (insets.bottom > 0 ? insets.bottom : 10), // Dynamic height based on safe area
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 10, // Dynamic padding
           paddingTop: 10,
         },
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Reels',
-          tabBarIcon: ({ color }) => <Clapperboard color={color} size={24} />,
-        }}
-      />
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: 'Store',
-          tabBarIcon: ({ color }) => <Store color={color} size={24} />,
-        }}
-      />
-      <Tabs.Screen
-        name="menu"
-        options={{
-          title: 'Menu',
+          title: 'Explore',
           tabBarIcon: ({ color }) => <UtensilsCrossed color={color} size={24} />,
         }}
       />
-
       <Tabs.Screen
-        name="search"
+        name="reels"
         options={{
-          title: 'Search',
-          tabBarIcon: ({ color }) => <Search color={color} size={24} />,
+          title: 'Reels',
+          tabBarIcon: ({ color }) => <Clapperboard color={color} size={24} />,
         }}
       />
       <Tabs.Screen
@@ -67,6 +52,18 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <User color={color} size={24} />,
         }}
       />
-    </Tabs>
+      <Tabs.Screen
+        name="menu"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          href: null,
+        }}
+      />
+    </Tabs >
   );
 }

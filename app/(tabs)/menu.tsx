@@ -1,6 +1,7 @@
 
 import Skeleton from '@/components/Skeleton';
-import api, { BASE_URL } from '@/constants/api';
+import api from '@/constants/api';
+import { getImageUrl } from '@/utils/image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Search } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -38,7 +39,7 @@ export default function MenuScreen() {
             setCategories(catRes.data);
             setProducts(prodRes.data);
         } catch (error) {
-            console.error('Error fetching menu:', error);
+            // Error fetching
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -70,12 +71,6 @@ export default function MenuScreen() {
             ]}>{item.name}</Text>
         </TouchableOpacity>
     );
-
-    const getImageUrl = (url: string) => {
-        if (!url) return 'https://via.placeholder.com/300';
-        if (url.startsWith('http')) return url;
-        return `${BASE_URL}${url}`;
-    };
 
     const renderItem = ({ item }: { item: any }) => (
         <TouchableOpacity
@@ -141,14 +136,14 @@ export default function MenuScreen() {
 
     if (loading) {
         return (
-            <View style={[styles.container, { paddingTop: insets.top }]}>
+            <View style={styles.container}>
                 {renderSkeleton()}
             </View>
         );
     }
 
     return (
-        <View style={[styles.container, { paddingTop: insets.top }]}>
+        <View style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Our Menu</Text>
             </View>
@@ -207,10 +202,11 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
     },
     headerTitle: {
-        fontSize: 24,
-        fontWeight: '800',
-        color: '#111827',
+        fontSize: 28,
+        fontWeight: '900',
+        color: '#111',
         letterSpacing: -0.5,
+        marginBottom: 8,
     },
     // Compact Search Styles
     searchContainer: {
@@ -273,17 +269,23 @@ const styles = StyleSheet.create({
         paddingHorizontal: 2,
     },
     card: {
-        width: '49%',
-        marginBottom: 16,
-        // Removed shadows, borders, background
+        width: '48%',
+        marginBottom: 12, // Reduced
+        backgroundColor: '#FFF',
+        borderRadius: 12, // Reduced radius slightly
+        borderWidth: 1, // Flat design with border
+        borderColor: '#E5E7EB',
+        overflow: 'hidden',
+        paddingBottom: 0,
     },
     imageContainer: {
         width: '100%',
-        height: 110,
-        borderRadius: 8, // Small radius
+        height: 100, // Reduced from 140
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
         overflow: 'hidden',
         position: 'relative',
-        backgroundColor: '#F0F0F0', // Slight placeholder color
+        backgroundColor: '#F3F4F6',
     },
     cardImage: {
         width: '100%',
@@ -305,22 +307,22 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     cardContent: {
-        paddingTop: 8, // Only top padding needed
-        paddingHorizontal: 0,
+        padding: 8, // Reduced padding
     },
     cardHeader: {
         marginBottom: 2,
     },
     cardTitle: {
-        fontSize: 13,
-        fontWeight: '400', // Not bold
-        color: '#1F2937',
+        fontSize: 13, // Smaller font
+        fontWeight: '600',
+        color: '#111',
         marginBottom: 2,
+        lineHeight: 18,
     },
     cardPrice: {
-        fontSize: 13,
-        fontWeight: '700', // Price bold
-        color: '#111827',
+        fontSize: 14, // Smaller price
+        fontWeight: '700',
+        color: '#FF4500',
     },
     oldPrice: {
         fontSize: 11,

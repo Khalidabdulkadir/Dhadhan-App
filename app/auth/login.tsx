@@ -22,8 +22,9 @@ export default function LoginScreen() {
         try {
             await login(username, password);
             router.replace('/(tabs)' as any);
-        } catch (error) {
-            Alert.alert('Error', 'Invalid credentials');
+        } catch (error: any) {
+            const message = error.response?.data?.detail || error.response?.data?.message || 'Invalid credentials or connection error.';
+            Alert.alert('Login Failed', message);
         } finally {
             setLoading(false);
         }
@@ -39,7 +40,7 @@ export default function LoginScreen() {
                     <View style={styles.content}>
                         <View style={styles.logoContainer}>
                             <Image
-                                source={require('@/assets/images/icon.png')}
+                                source={require('../../assets/images/icon.png')}
                                 style={styles.logo}
                             />
                             <Text style={styles.appName}>Dhadhan</Text>

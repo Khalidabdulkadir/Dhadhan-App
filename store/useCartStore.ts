@@ -12,6 +12,7 @@ export interface Product {
     calories: number;
     shipping_fee: number;
     restaurant_data?: {
+        id: number;
         name: string;
         whatsapp_number: string;
         bank_name?: string;

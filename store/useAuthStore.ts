@@ -45,7 +45,6 @@ export const useAuthStore = create<AuthState>((set) => ({
             const profileResponse = await api.get('/auth/profile/');
             set({ user: profileResponse.data, isAuthenticated: true });
         } catch (error) {
-            console.error('Login failed:', error);
             throw error;
         }
     },
@@ -65,7 +64,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 
             set({ user, isAuthenticated: true });
         } catch (error) {
-            console.error('Google login failed:', error);
             throw error;
         }
     },
@@ -85,7 +83,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 
             set({ user, isAuthenticated: true });
         } catch (error) {
-            console.error('Registration failed:', error);
             throw error;
         }
     },

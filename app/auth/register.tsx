@@ -46,7 +46,7 @@ export default function RegisterScreen() {
                     <View style={styles.content}>
                         <View style={styles.logoContainer}>
                             <Image
-                                source={require('@/assets/images/icon.png')}
+                                source={require('../../assets/images/icon.png')}
                                 style={styles.logo}
                             />
                             <Text style={styles.appName}>Dhadhan</Text>

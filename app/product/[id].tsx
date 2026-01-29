@@ -1,10 +1,12 @@
 
-import api, { BASE_URL } from '@/constants/api';
+import Skeleton from '@/components/Skeleton';
+import api from '@/constants/api';
 import { useCartStore } from '@/store/useCartStore';
+import { getImageUrl } from '@/utils/image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Clock, Flame, Minus, Plus, ShoppingCart, Star } from 'lucide-react-native';
+import { ArrowLeft, Clock, Flame, Minus, Plus, ShoppingCart } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ProductDetailsScreen() {
@@ -28,22 +30,33 @@ export default function ProductDetailsScreen() {
             const response = await api.get(`/products/${id}/`);
             setProduct(response.data);
         } catch (error) {
-            console.error('Error fetching product:', error);
+            // Error fetching product
         } finally {
             setLoading(false);
         }
     };
 
-    const getImageUrl = (url: string) => {
-        if (!url) return 'https://via.placeholder.com/300';
-        if (url.startsWith('http')) return url;
-        return `${BASE_URL}${url}`;
-    };
+
 
     if (loading) {
         return (
-            <View style={[styles.container, styles.center]}>
-                <ActivityIndicator size="large" color="#FF4500" />
+            <View style={styles.container}>
+                <View style={{ height: 420, backgroundColor: '#F3F4F6' }}>
+                    {/* Image Skeleton */}
+                </View>
+                <View style={[styles.content, { marginTop: -45, paddingTop: 32 }]}>
+                    <Skeleton width={200} height={32} style={{ marginBottom: 16, borderRadius: 8 }} />
+                    <View style={{ flexDirection: 'row', gap: 20, marginBottom: 24 }}>
+                        <Skeleton width={80} height={24} style={{ borderRadius: 6 }} />
+                        <Skeleton width={80} height={24} style={{ borderRadius: 6 }} />
+                    </View>
+                    <View style={{ marginBottom: 30 }}>
+                        <Skeleton width={120} height={36} style={{ marginBottom: 8, borderRadius: 8 }} />
+                        <Skeleton width={100} height={20} style={{ borderRadius: 4 }} />
+                    </View>
+                    <Skeleton width={150} height={24} style={{ marginBottom: 12, borderRadius: 4 }} />
+                    <Skeleton width="100%" height={100} style={{ borderRadius: 8 }} />
+                </View>
             </View>
         );
     }
@@ -56,10 +69,12 @@ export default function ProductDetailsScreen() {
         );
     }
 
+    const finalPrice = (Number(product.discount_percentage) > 0) ? product.discounted_price : product.price;
+
     const handleAddToCart = () => {
         const productToAdd = {
             ...product,
-            price: Number(product.price)
+            price: Number(finalPrice)
         };
 
         for (let i = 0; i < quantity; i++) {
@@ -68,10 +83,8 @@ export default function ProductDetailsScreen() {
         router.push('/(tabs)/cart');
     };
 
-    const finalPrice = product.is_promoted ? product.discounted_price : product.price;
-
     return (
-        <View style={[styles.container, { paddingTop: insets.top }]}>
+        <View style={styles.container}>
             <Stack.Screen options={{ headerShown: false }} />
 
             {/* Back Button */}
@@ -86,7 +99,7 @@ export default function ProductDetailsScreen() {
                 {/* Product Image */}
                 <View style={styles.imageContainer}>
                     <Image source={{ uri: getImageUrl(product.image) }} style={styles.image} />
-                    {product.is_promoted && (
+                    {(Number(product.discount_percentage) > 0) && (
                         <View style={styles.badge}>
                             <Text style={styles.badgeText}>{product.discount_percentage}% OFF</Text>
                         </View>
@@ -100,10 +113,7 @@ export default function ProductDetailsScreen() {
 
                     {/* Meta Info */}
                     <View style={styles.metaRow}>
-                        <View style={styles.metaItem}>
-                            <Star fill="#FFB800" stroke="#FFB800" size={18} />
-                            <Text style={styles.metaText}>{product.rating}</Text>
-                        </View>
+
                         {product.calories > 0 && (
                             <View style={styles.metaItem}>
                                 <Flame fill="#FF4500" stroke="#FF4500" size={18} />
@@ -120,7 +130,7 @@ export default function ProductDetailsScreen() {
                     <View style={styles.priceContainer}>
                         <View>
                             <Text style={styles.price}>KSh {Number(finalPrice).toFixed(2)}</Text>
-                            {product.is_promoted && (
+                            {(Number(product.discount_percentage) > 0) && (
                                 <Text style={styles.oldPrice}>KSh {Number(product.price).toFixed(2)}</Text>
                             )}
                         </View>

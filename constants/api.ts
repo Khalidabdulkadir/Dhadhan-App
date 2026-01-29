@@ -3,8 +3,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-// Replace with your machine's IP address or Production URL
-export const BASE_URL = 'https://dhadhan-app.onrender.com';
+export const BASE_URL = 'https://abi.sominnovations.xyz';
 const API_URL = `${BASE_URL}/api`;
 
 const api = axios.create({
@@ -14,7 +13,6 @@ const api = axios.create({
     },
 });
 
-// Add a request interceptor to attach the token
 api.interceptors.request.use(
     async (config) => {
         if (Platform.OS !== 'web') {
@@ -38,7 +36,7 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
         if (error.response && error.response.status === 401) {
-            console.log('Session expired, logging out...');
+            // Session expired, logging out...
             if (Platform.OS !== 'web') {
                 await SecureStore.deleteItemAsync('accessToken');
                 await SecureStore.deleteItemAsync('refreshToken');

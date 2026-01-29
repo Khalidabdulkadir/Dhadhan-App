@@ -1,5 +1,7 @@
 import Skeleton from '@/components/Skeleton';
-import api, { BASE_URL } from '@/constants/api';
+import api from '@/constants/api';
+import { logRestaurantView } from '@/utils/analytics';
+import { getImageUrl } from '@/utils/image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { BadgeCheck, Clock, Search } from 'lucide-react-native';
@@ -23,6 +25,12 @@ export default function RestaurantDetailsScreen() {
         fetchRestaurantData();
     }, [id]);
 
+    useEffect(() => {
+        if (restaurant) {
+            logRestaurantView(restaurant.id, restaurant.name);
+        }
+    }, [restaurant]);
+
     const fetchRestaurantData = async () => {
         try {
             setLoading(true);
@@ -41,17 +49,13 @@ export default function RestaurantDetailsScreen() {
             // Default select "All" is already set in initial state, or set here:
             setSelectedCategory('all');
         } catch (error) {
-            console.error("Error fetching restaurant details:", error);
+            // Error fetching restaurant details
         } finally {
             setLoading(false);
         }
     };
 
-    const getImageUrl = (url: string) => {
-        if (!url) return 'https://via.placeholder.com/150';
-        if (url.startsWith('http')) return url;
-        return `${BASE_URL}${url}`;
-    };
+
 
     const filteredProducts = products.filter(p => {
         const matchesCategory = selectedCategory === 'all'
@@ -91,9 +95,27 @@ export default function RestaurantDetailsScreen() {
             <View style={styles.productInfo}>
                 <View style={styles.productHeader}>
                     <Text style={styles.productName}>{item.name}</Text>
-                    <Text style={styles.productPrice}>${item.price}</Text>
+                    <View style={{ alignItems: 'flex-end' }}>
+                        {Number(item.discount_percentage) > 0 ? (
+                            <>
+                                <Text style={styles.productPrice}>KSh {Math.round(item.discounted_price)}</Text>
+                                <Text style={{ fontSize: 11, color: '#999', textDecorationLine: 'line-through' }}>
+                                    KSh {item.price}
+                                </Text>
+                            </>
+                        ) : (
+                            <Text style={styles.productPrice}>KSh {item.price}</Text>
+                        )}
+                    </View>
                 </View>
                 <Text style={styles.productDesc} numberOfLines={2}>{item.description}</Text>
+                {Number(item.discount_percentage) > 0 && (
+                    <View style={{ flexDirection: 'row', marginTop: 4 }}>
+                        <Text style={{ fontSize: 10, color: '#FF4500', fontWeight: 'bold', backgroundColor: '#FFF0E6', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                            {Math.round(item.discount_percentage)}% OFF
+                        </Text>
+                    </View>
+                )}
             </View>
         </TouchableOpacity>
     );
@@ -177,6 +199,13 @@ export default function RestaurantDetailsScreen() {
                                     <Text style={styles.restaurantName}>{restaurant.name}</Text>
                                     {restaurant.is_verified && (
                                         <BadgeCheck size={18} color="#1877F2" fill="#1877F2" stroke="white" />
+                                    )}
+                                    {(Number(restaurant.discount_percentage) > 0) && (
+                                        <View style={{ backgroundColor: '#FF4500', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, marginLeft: 4 }}>
+                                            <Text style={{ color: '#FFF', fontSize: 10, fontWeight: '700' }}>
+                                                {Math.round(restaurant.discount_percentage)}% OFF
+                                            </Text>
+                                        </View>
                                     )}
                                 </View>
                                 <Text style={styles.tagline}>{restaurant.description || 'Tasty food for you'}</Text>
@@ -452,7 +481,7 @@ const styles = StyleSheet.create({
     productPrice: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#111',
+        color: '#f7310ebd',
     },
     productDesc: {
         fontSize: 13,

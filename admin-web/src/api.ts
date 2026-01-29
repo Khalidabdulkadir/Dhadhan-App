@@ -1,9 +1,8 @@
 import axios from 'axios';
 
-// Force relative path in production to ensure we use the same domain (and avoid CORS/localhost issues)
-// Force local development URL
-export const BASE_URL = 'https://dhadhan-app.onrender.com';
-const API_URL = `${BASE_URL}/api`;
+// Use environment variable or fallback to production backend
+export const BASE_URL = import.meta.env.VITE_API_URL || 'https://abi.sominnovations.xyz/api';
+const API_URL = BASE_URL;
 
 const api = axios.create({
     baseURL: API_URL,

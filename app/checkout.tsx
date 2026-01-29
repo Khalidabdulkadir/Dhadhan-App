@@ -82,7 +82,7 @@ export default function CheckoutScreen() {
             clearCart();
             router.replace('/tracking');
         } catch (error: any) {
-            console.error('Order failed:', error);
+            // Order failed
             const errorMessage = error.response?.data?.detail
                 || error.response?.data?.message
                 || 'Failed to place order. Please try again.';

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "30176755525",
+    "project_id": "dhadhan-app",
+    "storage_bucket": "dhadhan-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:30176755525:android:0a31a5bab6c69799ed882c",
+        "android_client_info": {
+          "package_name": "com.matrix.restaurant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnBNl05glEDD04KkQbZL1pxDeF-NSNmhA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
