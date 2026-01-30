@@ -1,10 +1,11 @@
+import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
 import api from '@/constants/api';
 import { logRestaurantView } from '@/utils/analytics';
 import { getImageUrl } from '@/utils/image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { BadgeCheck, Clock, Search } from 'lucide-react-native';
+import { ArrowLeft, BadgeCheck, Clock, Search } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -179,8 +180,10 @@ export default function RestaurantDetailsScreen() {
                         source={{ uri: getImageUrl(restaurant.cover_image || restaurant.logo) }}
                         style={styles.coverImage}
                     />
-                    {/* Back Button Removed */}
                 </View>
+
+                {/* Floating Header Actions - Placed here to be above Image but we need it above ScrollView too? 
+                   Actually, if we put it AFTER ScrollView it will be on top. */}
 
                 {/* Force Status Bar Visible */}
                 <StatusBar hidden={false} style="light" />
@@ -217,7 +220,7 @@ export default function RestaurantDetailsScreen() {
                         <View style={styles.deliveryInfo}>
                             <View style={styles.deliveryItem}>
                                 <Clock size={16} color="#555" />
-                                <Text style={styles.deliveryText}>25 - 40 mins</Text>
+                                <Text style={styles.deliveryText}>40-55 mins</Text>
                             </View>
                         </View>
                     </View>
@@ -253,13 +256,24 @@ export default function RestaurantDetailsScreen() {
                     <View style={styles.productsList}>
                         {filteredProducts.map(item => renderProduct(item))}
                         {filteredProducts.length === 0 && (
-                            <Text style={styles.emptyText}>No items found.</Text>
+                            <EmptyState
+                                title="No Items Found"
+                                message="There are no products in this category yet."
+                                style={{ marginTop: 24, paddingBottom: 48 }}
+                            />
                         )}
                     </View>
 
                     {/* Bottom Padding */}
                     <View style={{ height: 40 }} />
                 </ScrollView>
+
+                {/* Back Button - Placed AFTER ScrollView to be on top */}
+                <View style={[styles.headerActions, { top: insets.top + 10 }]}>
+                    <TouchableOpacity style={styles.circleButton} onPress={() => router.back()}>
+                        <ArrowLeft size={24} color="#000" />
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );

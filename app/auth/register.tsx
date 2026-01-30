@@ -2,7 +2,7 @@
 import { useAuthStore } from '@/store/useAuthStore';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RegisterScreen() {
@@ -40,123 +40,114 @@ export default function RegisterScreen() {
         <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={{ flex: 1 }}
+                style={{ flex: 1, justifyContent: 'center' }}
             >
-                <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: Platform.OS === 'ios' ? 20 : 150 }]}>
-                    <View style={styles.content}>
-                        <View style={styles.logoContainer}>
-                            <Image
-                                source={require('../../assets/images/icon.png')}
-                                style={styles.logo}
+                <View style={styles.content}>
+                    <View style={styles.logoContainer}>
+                        <Image
+                            source={require('../../assets/images/icon4.png')}
+                            style={styles.logo}
+                        />
+                    </View>
+
+                    <View style={styles.formCard}>
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Email *</Text>
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    focusedInput === 'email' && styles.inputFocused
+                                ]}
+                                placeholder="Enter your email"
+                                placeholderTextColor="#999"
+                                value={formData.email}
+                                onChangeText={(text) => setFormData({ ...formData, email: text })}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                onFocus={() => setFocusedInput('email')}
+                                onBlur={() => setFocusedInput(null)}
                             />
-                            <Text style={styles.appName}>Dhadhan</Text>
                         </View>
 
-                        <View style={styles.formCard}>
-                            <Text style={styles.title}>Create Account</Text>
-                            <Text style={styles.subtitle}>Join us to order delicious food</Text>
-
-                            <View style={styles.inputGroup}>
-                                <Text style={styles.label}>Email *</Text>
+                        <View style={styles.row}>
+                            <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                                <Text style={styles.label}>First Name</Text>
                                 <TextInput
                                     style={[
                                         styles.input,
-                                        focusedInput === 'email' && styles.inputFocused
+                                        focusedInput === 'first_name' && styles.inputFocused
                                     ]}
-                                    placeholder="Enter your email"
+                                    placeholder="First name"
                                     placeholderTextColor="#999"
-                                    value={formData.email}
-                                    onChangeText={(text) => setFormData({ ...formData, email: text })}
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                    onFocus={() => setFocusedInput('email')}
+                                    value={formData.first_name}
+                                    onChangeText={(text) => setFormData({ ...formData, first_name: text })}
+                                    onFocus={() => setFocusedInput('first_name')}
                                     onBlur={() => setFocusedInput(null)}
                                 />
                             </View>
-
-                            <View style={styles.row}>
-                                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                                    <Text style={styles.label}>First Name</Text>
-                                    <TextInput
-                                        style={[
-                                            styles.input,
-                                            focusedInput === 'first_name' && styles.inputFocused
-                                        ]}
-                                        placeholder="First name"
-                                        placeholderTextColor="#999"
-                                        value={formData.first_name}
-                                        onChangeText={(text) => setFormData({ ...formData, first_name: text })}
-                                        onFocus={() => setFocusedInput('first_name')}
-                                        onBlur={() => setFocusedInput(null)}
-                                    />
-                                </View>
-                                <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
-                                    <Text style={styles.label}>Last Name</Text>
-                                    <TextInput
-                                        style={[
-                                            styles.input,
-                                            focusedInput === 'last_name' && styles.inputFocused
-                                        ]}
-                                        placeholder="Last name"
-                                        placeholderTextColor="#999"
-                                        value={formData.last_name}
-                                        onChangeText={(text) => setFormData({ ...formData, last_name: text })}
-                                        onFocus={() => setFocusedInput('last_name')}
-                                        onBlur={() => setFocusedInput(null)}
-                                    />
-                                </View>
-                            </View>
-
-                            <View style={styles.inputGroup}>
-                                <Text style={styles.label}>Password *</Text>
+                            <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
+                                <Text style={styles.label}>Last Name</Text>
                                 <TextInput
                                     style={[
                                         styles.input,
-                                        focusedInput === 'password' && styles.inputFocused
+                                        focusedInput === 'last_name' && styles.inputFocused
                                     ]}
-                                    placeholder="Create a password"
+                                    placeholder="Last name"
                                     placeholderTextColor="#999"
-                                    value={formData.password}
-                                    onChangeText={(text) => setFormData({ ...formData, password: text })}
-                                    secureTextEntry
-                                    onFocus={() => setFocusedInput('password')}
+                                    value={formData.last_name}
+                                    onChangeText={(text) => setFormData({ ...formData, last_name: text })}
+                                    onFocus={() => setFocusedInput('last_name')}
                                     onBlur={() => setFocusedInput(null)}
                                 />
                             </View>
+                        </View>
 
-                            <TouchableOpacity
-                                style={[styles.button, loading && styles.buttonDisabled]}
-                                onPress={handleRegister}
-                                disabled={loading}
-                                activeOpacity={0.8}
-                            >
-                                <Text style={styles.buttonText}>{loading ? 'Creating Account...' : 'Sign Up'}</Text>
-                            </TouchableOpacity>
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Password *</Text>
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    focusedInput === 'password' && styles.inputFocused
+                                ]}
+                                placeholder="Create a password"
+                                placeholderTextColor="#999"
+                                value={formData.password}
+                                onChangeText={(text) => setFormData({ ...formData, password: text })}
+                                secureTextEntry
+                                onFocus={() => setFocusedInput('password')}
+                                onBlur={() => setFocusedInput(null)}
+                            />
+                        </View>
 
-                            <View style={styles.footer}>
-                                <Text style={styles.footerText}>Already have an account? </Text>
-                                <Link href={"/auth/login" as any} asChild>
-                                    <TouchableOpacity>
-                                        <Text style={styles.link}>Sign In</Text>
-                                    </TouchableOpacity>
-                                </Link>
-                            </View>
+                        <TouchableOpacity
+                            style={[styles.button, loading && styles.buttonDisabled]}
+                            onPress={handleRegister}
+                            disabled={loading}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={styles.buttonText}>{loading ? 'Creating Account...' : 'Sign Up'}</Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.footer}>
+                            <Text style={styles.footerText}>Already have an account? </Text>
+                            <Link href={"/auth/login" as any} asChild>
+                                <TouchableOpacity>
+                                    <Text style={styles.link}>Sign In</Text>
+                                </TouchableOpacity>
+                            </Link>
                         </View>
                     </View>
-                </ScrollView>
+                </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
 
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F8F9FA',
-    },
-    scrollContent: {
-        flexGrow: 1,
-        justifyContent: 'center',
     },
     content: {
         padding: 24,
@@ -171,12 +162,6 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         borderRadius: 20,
     },
-    appName: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#1A1A1A',
-        letterSpacing: 0.5,
-    },
     formCard: {
         backgroundColor: '#FFFFFF',
         borderRadius: 24,
@@ -189,19 +174,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.05,
         shadowRadius: 12,
         elevation: 4,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#1A1A1A',
-        marginBottom: 8,
-        textAlign: 'center',
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#666',
-        textAlign: 'center',
-        marginBottom: 32,
     },
     row: {
         flexDirection: 'row',

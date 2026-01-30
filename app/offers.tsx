@@ -1,3 +1,4 @@
+import EmptyState from '@/components/EmptyState';
 import api from '@/constants/api';
 import { getImageUrl } from '@/utils/image';
 import { Stack, useRouter } from 'expo-router';
@@ -100,9 +101,10 @@ export default function OffersScreen() {
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF4500']} />
                     }
                     ListEmptyComponent={
-                        <View style={styles.center}>
-                            <Text style={styles.emptyText}>No active offers right now.</Text>
-                        </View>
+                        <EmptyState
+                            title="No Offers Available"
+                            message="Check back later for special deals and discounts!"
+                        />
                     }
                 />
             )}

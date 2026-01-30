@@ -1,10 +1,11 @@
+import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
 import api from '@/constants/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { getImageUrl } from '@/utils/image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { ArrowRight, BadgeCheck, MapPin, Search, X } from 'lucide-react-native';
+import { ArrowRight, BadgeCheck, Clock, Heart, MapPin, Search, X } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Dimensions, FlatList, Image, Platform, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -308,18 +309,28 @@ export default function HomeScreen() {
     <TouchableOpacity style={styles.offerCard} onPress={() => router.push(`/product/${item.id}`)}>
       <View style={styles.offerImageContainer}>
         <Image source={{ uri: getImageUrl(item.image) }} style={styles.offerImage} />
+        {/* Discount Badge */}
         {item.discount_percentage > 0 && (
           <View style={styles.offerBadge}>
             <Text style={styles.offerBadgeText}>{Math.round(item.discount_percentage)}%</Text>
           </View>
         )}
+        {/* Heart Icon (Top Right) */}
+        <View style={styles.heartButtonOverlay}>
+          <Heart size={18} color="#FFF" />
+        </View>
       </View>
       <View style={styles.offerContent}>
         <Text style={styles.offerTitle} numberOfLines={1}>{item.name}</Text>
-        <Text style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }} numberOfLines={1}>{item.restaurant_data?.name}</Text>
-        <View style={styles.offerPriceRow}>
-          <Text style={styles.offerPriceNew}>KSh {Math.round(item.discounted_price)}</Text>
-          <Text style={styles.offerPriceOld}>KSh {item.price}</Text>
+        <Text style={styles.offerRestaurantName} numberOfLines={1}>{item.restaurant_data?.name}</Text>
+
+        <View style={styles.offerMetaRow}>
+          <Text style={styles.offerPriceNew}>Ksh {Math.round(item.discounted_price)}</Text>
+          <Text style={styles.offerPriceOld}>Ksh {item.price}</Text>
+          <View style={styles.offerTimeContainer}>
+            <Clock size={12} color="#6B7280" />
+            <Text style={styles.offerTimeText}>40-55 min</Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -387,30 +398,6 @@ export default function HomeScreen() {
         {/* Dashoard Content - Only show when NOT searching */}
         {!searchQuery && (
           <>
-            {/* Hero Campaigns - Full Width Carousel */}
-            {visibleCampaigns.length > 0 && (
-              <View style={{ marginBottom: 24 }}>
-                <FlatList
-                  ref={campaignListRef}
-                  data={visibleCampaigns}
-                  renderItem={renderHeroCampaign}
-                  keyExtractor={(item) => item.id.toString()}
-                  horizontal
-                  pagingEnabled // Snaps to full width
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ paddingHorizontal: 0 }} // Remove wrapper padding, handled by item
-                  snapToInterval={CONTAINER_WIDTH} // Interval = Screen Width
-                  decelerationRate="fast"
-                  onScrollToIndexFailed={(info: { index: number; highestMeasuredFrameIndex: number; averageItemLength: number }) => {
-                    const wait = new Promise(resolve => setTimeout(resolve, 500));
-                    wait.then(() => {
-                      campaignListRef.current?.scrollToIndex({ index: info.index, animated: true });
-                    });
-                  }}
-                />
-              </View>
-            )}
-
             {/* Main Categories (Moved) */}
             <View style={styles.categoriesRow}>
               {/* 1. Restaurants */}
@@ -462,51 +449,38 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Verified Brands (NEW) */}
-            {visibleVerified.length > 0 && (
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionHeading}>Verified Brands</Text>
-                  <TouchableOpacity onPress={() => router.push('/list/verified')}>
-                    <ArrowRight size={20} color="#111" />
-                  </TouchableOpacity>
-                </View>
+            {/* Hero Campaigns - Full Width Carousel */}
+            {visibleCampaigns.length > 0 && (
+              <View style={{ marginBottom: 24 }}>
                 <FlatList
-                  data={visibleVerified}
-                  renderItem={renderBrand}
+                  ref={campaignListRef}
+                  data={visibleCampaigns}
+                  renderItem={renderHeroCampaign}
                   keyExtractor={(item) => item.id.toString()}
                   horizontal
+                  pagingEnabled // Snaps to full width
                   showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.horizontalScroll}
+                  contentContainerStyle={{ paddingHorizontal: 0 }} // Remove wrapper padding, handled by item
+                  snapToInterval={CONTAINER_WIDTH} // Interval = Screen Width
+                  decelerationRate="fast"
+                  onScrollToIndexFailed={(info: { index: number; highestMeasuredFrameIndex: number; averageItemLength: number }) => {
+                    const wait = new Promise(resolve => setTimeout(resolve, 500));
+                    wait.then(() => {
+                      campaignListRef.current?.scrollToIndex({ index: info.index, animated: true });
+                    });
+                  }}
                 />
               </View>
             )}
-
-            {/* 1. Brands (Popular) */}
-            {/* <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionHeading}>Top Brands</Text>
-                <TouchableOpacity onPress={() => router.push('/list/popular')}>
-                  <ArrowRight size={20} color="#111" />
-                </TouchableOpacity>
-              </View>
-              <FlatList
-                data={visiblePopular}
-                renderItem={renderBrand}
-                keyExtractor={(item) => item.id.toString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.horizontalScroll}
-              />
-            </View> */}
 
             {/* 2. Special Offers (Products) */}
             {visibleOfferProducts.length > 0 && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
                   <Text style={styles.sectionHeading}>Special Offers</Text>
-                  <TouchableOpacity onPress={() => router.push('/offers')}>
-                    <ArrowRight size={20} color="#111" />
+                  <TouchableOpacity onPress={() => router.push('/offers')} style={styles.seeAllButton}>
+                    <Text style={styles.seeAllText}>See all</Text>
+                    <ArrowRight size={16} color="#FF4500" />
                   </TouchableOpacity>
                 </View>
                 <FlatList
@@ -532,13 +506,35 @@ export default function HomeScreen() {
               </View>
             )}
 
+
+            {/* 1. Brands (Popular) */}
+            {/* <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionHeading}>Top Brands</Text>
+                <TouchableOpacity onPress={() => router.push('/list/popular')}>
+                  <ArrowRight size={20} color="#111" />
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={visiblePopular}
+                renderItem={renderBrand}
+                keyExtractor={(item) => item.id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.horizontalScroll}
+              />
+            </View> */}
+
+
+
             {/* 3. Hot Products (Horizontal Layout) */}
             {visibleHotProducts.length > 0 && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
                   <Text style={styles.sectionHeading}>Popular Dishes</Text>
-                  <TouchableOpacity onPress={() => router.push('/list/hot')}>
-                    <ArrowRight size={20} color="#111" />
+                  <TouchableOpacity onPress={() => router.push('/list/hot')} style={styles.seeAllButton}>
+                    <Text style={styles.seeAllText}>See all</Text>
+                    <ArrowRight size={16} color="#FF4500" />
                   </TouchableOpacity>
                 </View>
                 <FlatList
@@ -559,8 +555,9 @@ export default function HomeScreen() {
             <Text style={styles.sectionHeading}>
               {searchQuery ? `Results for "${searchQuery}"` : (selectedLocation ? `Explore ${selectedLocation}` : 'Browse Food')}
             </Text>
-            <TouchableOpacity onPress={() => router.push('/(tabs)/menu')}>
-              <ArrowRight size={20} color="#111" />
+            <TouchableOpacity onPress={() => router.push('/(tabs)/menu')} style={styles.seeAllButton}>
+              <Text style={styles.seeAllText}>See all</Text>
+              <ArrowRight size={16} color="#FF4500" />
             </TouchableOpacity>
           </View>
 
@@ -579,6 +576,7 @@ export default function HomeScreen() {
             </View>
           )}
 
+
           {/* Display Products (Unified Horizontal) */}
           <View style={{ marginBottom: 20 }}>
             {foundProducts.length > 0 && (
@@ -593,9 +591,11 @@ export default function HomeScreen() {
             )}
 
             {foundProducts.length === 0 && foundRestaurants.length === 0 && (
-              <View style={{ width: '100%', alignItems: 'center', padding: 20 }}>
-                <Text style={{ color: '#888' }}>No delicious items found.</Text>
-              </View>
+              <EmptyState
+                title="No delicious items found"
+                message={`We couldn't find anything matching "${searchQuery}". Try a different search term or browse our categories.`}
+                style={{ marginTop: 20 }}
+              />
             )}
           </View>
         </View>
@@ -736,9 +736,9 @@ const styles = StyleSheet.create({
 
   // HERO (Full Width)
   heroCard: {
-    height: 150, // Reduced from 150
+    height: 145, // Reduced to 135 per "make smaller still" request
     marginRight: 0,
-    borderRadius: 16, // Reduced radius slightly
+    borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: '#000',
     marginBottom: 6,
@@ -752,35 +752,35 @@ const styles = StyleSheet.create({
     position: 'absolute',
     inset: 0,
     justifyContent: 'flex-end',
-    padding: 12, // Reduced padding
+    padding: 16, // Increased padding
   },
   heroContent: {
-    gap: 2, // Reduced gap
+    gap: 4, // Increased gap
   },
   heroBadge: {
     backgroundColor: '#FF4500',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 100,
     alignSelf: 'flex-start',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   heroBadgeText: {
     color: '#FFF',
-    fontSize: 10,
+    fontSize: 12, // Increased from 10
     fontWeight: '900',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
   heroTitle: {
-    fontSize: 20, // Reduced from 24
+    fontSize: 20, // Reduced to fit 135px height
     fontWeight: '900',
     letterSpacing: -0.5,
     color: '#FFF',
   },
   heroSubtitle: {
     color: 'rgba(255,255,255,0.95)',
-    fontSize: 12,
+    fontSize: 14, // Increased from 12
     fontWeight: '600',
   },
 
@@ -794,17 +794,17 @@ const styles = StyleSheet.create({
   },
   mainCategoryItem: {
     alignItems: 'center',
-    gap: 2, // Reduced from 4
+    gap: 6, // Increased from 2
     flex: 1, // Distribute space
   },
   mainCatIcon: {
-    width: 47, // Reduced from 52
-    height: 47,
-    borderRadius: 16, // Squircle
+    width: 64, // Reduced from 72 ("little smaller")
+    height: 64,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFF', // White bg for shadow to pop
-    marginBottom: 2, // More space for text
+    backgroundColor: '#FFF',
+    marginBottom: 4,
     borderWidth: 1,
     borderColor: '#F3F4F6',
     // Shadow
@@ -815,40 +815,41 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   iconImage: {
-    width: '55%',
-    height: '55%',
+    width: '50%',
+    height: '50%',
     resizeMode: 'contain',
   },
   mainCatText: {
-    fontSize: 10, // Reduced from 11
+    fontSize: 12, // Increased from 10
     fontWeight: '600', // Reduced weight slightly for cleanliness
     color: '#374151',
     textAlign: 'center',
   },
 
   // BRANDS
+  // BRANDS
   restaurantCard: {
-    width: 110, // Reduced from 120
+    width: 125, // Reduced from 140 ("little smaller")
     marginRight: 10,
     backgroundColor: '#FFF',
-    borderRadius: 12,
-    padding: 8, // Reduced padding
+    borderRadius: 16,
+    padding: 10,
     alignItems: 'center',
-    borderWidth: 1, // Replace shadow with light border
+    borderWidth: 1,
     borderColor: '#E5E7EB',
   },
   restaurantImageContainer: {
-    width: 60, // Reduced from 70
-    height: 60, // Reduced from 70
-    borderRadius: 30, // Half of width/height
-    marginBottom: 6,
+    width: 70, // Scaled down from 80
+    height: 70,
+    borderRadius: 35,
+    marginBottom: 8,
     position: 'relative',
     backgroundColor: '#F3F4F6',
   },
   restaurantImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 30, // Half of width/height
+    borderRadius: 40, // Half of width/height
     resizeMode: 'cover',
   },
   restaurantOverlay: {
@@ -858,12 +859,12 @@ const styles = StyleSheet.create({
   },
   restaurantTag: {
     backgroundColor: '#FF4500',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: 8,
   },
   restaurantTagText: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#FFF',
   },
@@ -872,23 +873,24 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   restaurantTitle: {
-    fontSize: 12, // Reduced from 14
+    fontSize: 14, // Increased from 12
     fontWeight: '700',
     color: '#111',
     textAlign: 'center',
     marginBottom: 2,
   },
   restaurantMeta: {
-    fontSize: 10,
+    fontSize: 11,
     color: '#6B7280',
     fontWeight: '500',
     textAlign: 'center',
   },
 
   // FEATURED OFFERS
+  // FEATURED OFFERS
   featuredCard: {
-    width: 280,
-    height: 160,
+    width: 300, // Increased from 280
+    height: 180, // Increased from 160
     marginRight: 16,
     borderRadius: 20,
     overflow: 'hidden',
@@ -921,7 +923,7 @@ const styles = StyleSheet.create({
   featuredContent: {},
   featuredName: {
     color: '#FFF',
-    fontSize: 20,
+    fontSize: 22, // Increased from 20
     fontWeight: '800',
     textShadowColor: 'rgba(0,0,0,0.5)',
     textShadowOffset: { width: 0, height: 1 },
@@ -930,22 +932,23 @@ const styles = StyleSheet.create({
 
   // OFFER CARDS (Product)
   offerCard: {
-    width: 160, // Increased from 140
-    marginRight: 12,
+    width: 220,
+    marginRight: 16,
     backgroundColor: '#FFF',
-    borderRadius: 12,
+    // No border, just view
     flexDirection: 'column',
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    position: 'relative',
-    height: 185, // Balanced height for 160 width
+    overflow: 'visible',
+    height: 210,
+    marginBottom: 6,
   },
   offerImageContainer: {
     width: '100%',
-    height: 100, // Increased from 85
+    height: 135, // Taller image
+    borderRadius: 12,
+    overflow: 'hidden',
     backgroundColor: '#F3F4F6',
     position: 'relative',
+    marginBottom: 8,
   },
   offerImage: {
     width: '100%',
@@ -953,15 +956,13 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   offerContent: {
-    flex: 1,
-    padding: 8, // Reduced padding
-    justifyContent: 'center',
+    paddingHorizontal: 0, // Align with left
   },
   offerBadge: {
     position: 'absolute',
-    top: 6,
-    left: 6,
-    backgroundColor: '#FF4500',
+    top: 8,
+    left: 8,
+    backgroundColor: '#FF4500', // Orange Badge
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -969,31 +970,68 @@ const styles = StyleSheet.create({
   },
   offerBadgeText: {
     color: '#FFF',
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: 'bold',
   },
+  heartButtonOverlay: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 1,
+  },
+  ratingPillOverlay: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: '#FFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 6,
+    gap: 4,
+    elevation: 2,
+  },
+  ratingTextOverlay: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#111',
+  },
   offerTitle: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
     color: '#111',
     marginBottom: 2,
-    lineHeight: 16,
+    lineHeight: 20,
   },
-  offerPriceRow: {
+  offerRestaurantName: {
+    fontSize: 13,
+    color: '#4B5563',
+    marginBottom: 4,
+  },
+  offerMetaRow: {
     flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 6,
-    marginTop: 4,
-  },
-  offerPriceOld: {
-    fontSize: 11,
-    color: '#9CA3AF',
-    textDecorationLine: 'line-through',
+    alignItems: 'center',
+    gap: 8,
   },
   offerPriceNew: {
     fontSize: 14,
-    fontWeight: '800',
-    color: '#FF4500',
+    fontWeight: '700',
+    color: '#FF4500', // Orange Price
+  },
+  offerPriceOld: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    textDecorationLine: 'line-through',
+  },
+  offerTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  offerTimeText: {
+    fontSize: 12,
+    color: '#6B7280',
   },
 
   // HOT PRODUCTS (Grid)
@@ -1017,14 +1055,14 @@ const styles = StyleSheet.create({
   },
   hotProductImage: {
     width: '100%',
-    height: 110, // Compact height
+    height: 140, // Increased from 110
     resizeMode: 'cover',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
   hotProductContent: {
-    padding: 10,
-    paddingBottom: 12,
+    padding: 12, // Increased
+    paddingBottom: 14,
   },
   hotPriceTag: {
     position: 'absolute',
@@ -1042,15 +1080,15 @@ const styles = StyleSheet.create({
   hotPriceText: {
     color: '#FF4500', // Orange text
     fontWeight: '800',
-    fontSize: 12,
+    fontSize: 13, // Increased
   },
   hotProductTitle: {
-    fontSize: 13, // Reduced from 16
+    fontSize: 14, // Increased from 13
     fontWeight: '700',
     color: '#111',
     marginTop: 4,
     marginBottom: 2,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   hotProductDesc: {
     fontSize: 11, // Reduced from 13
@@ -1082,5 +1120,16 @@ const styles = StyleSheet.create({
   hotPriceRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
+  },
+  seeAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    padding: 4,
+  },
+  seeAllText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FF4500',
   },
 });

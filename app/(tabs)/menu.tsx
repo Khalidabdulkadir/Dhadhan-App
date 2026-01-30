@@ -1,4 +1,5 @@
 
+import EmptyState from '@/components/EmptyState';
 import Skeleton from '@/components/Skeleton';
 import api from '@/constants/api';
 import { getImageUrl } from '@/utils/image';
@@ -182,9 +183,11 @@ export default function MenuScreen() {
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF4500']} />
                 }
                 ListEmptyComponent={
-                    <View style={styles.emptyState}>
-                        <Text style={styles.emptyText}>No items found</Text>
-                    </View>
+                    <EmptyState
+                        title="No Items"
+                        message={`We couldn't find any items matching "${searchQuery}".`}
+                        style={{ marginTop: 40 }}
+                    />
                 }
             />
         </View>

@@ -122,7 +122,7 @@ export default function ProductDetailsScreen() {
                         )}
                         <View style={styles.metaItem}>
                             <Clock color="#666" size={18} />
-                            <Text style={styles.metaText}>20-30 min</Text>
+                            <Text style={styles.metaText}>40-55 min</Text>
                         </View>
                     </View>
 

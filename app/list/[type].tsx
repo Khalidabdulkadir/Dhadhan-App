@@ -1,7 +1,7 @@
 import api from '@/constants/api';
 import { getImageUrl } from '@/utils/image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, BadgeCheck, Search } from 'lucide-react-native';
+import { ArrowLeft, BadgeCheck, Clock, Heart, MapPin, Search } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,6 +26,8 @@ export default function RestaurantListScreen() {
             const allRest = res.data;
 
             let filtered = [];
+            // If viewing 'all', we fetch everything and split into sections in render.
+            // If viewing 'verified' or 'popular' specifically, we filter here for the main list.
             if (type === 'verified') {
                 filtered = allRest.filter((r: any) => r.is_verified);
             } else if (type === 'popular') {
@@ -41,12 +43,37 @@ export default function RestaurantListScreen() {
         }
     };
 
-
-
+    // Filter main list by search
     const filteredRestaurants = restaurants.filter(item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    // Derived lists for Hub View (only valid when type === 'all' or default)
+    const verifiedBrands = restaurants.filter(r => r.is_verified);
+    const popularBrands = restaurants.filter(r => r.is_popular); // Assuming is_popular exists
+
+    // --- RENDERERS ---
+
+    // 1. Horizontal Circle Brand (Verified)
+    const renderBrand = ({ item }: { item: any }) => (
+        <TouchableOpacity
+            style={styles.brandCard}
+            onPress={() => router.push(`/restaurant/${item.id}`)}
+            activeOpacity={0.8}
+        >
+            <View style={styles.brandImageContainer}>
+                <Image source={{ uri: getImageUrl(item.logo || item.cover_image) }} style={styles.brandLogo} />
+                {item.is_verified && (
+                    <View style={styles.brandVerifiedBadge}>
+                        <BadgeCheck size={12} color="#FFF" fill="#1877F2" />
+                    </View>
+                )}
+            </View>
+            <Text style={styles.brandName} numberOfLines={1}>{item.name}</Text>
+        </TouchableOpacity>
+    );
+
+    // 2. Main Vertical Restaurant Card (Cool Style)
     const renderRestaurant = ({ item }: { item: any }) => (
         <TouchableOpacity
             style={styles.card}
@@ -55,33 +82,95 @@ export default function RestaurantListScreen() {
         >
             <View style={styles.imageContainer}>
                 <Image source={{ uri: getImageUrl(item.cover_image || item.logo) }} style={styles.image} />
-                {Number(item.discount_percentage) > 0 && (
-                    <View style={styles.badge}>
-                        <Text style={styles.badgeText}>{Math.round(item.discount_percentage)}% OFF</Text>
-                    </View>
-                )}
-            </View>
-            <View style={styles.info}>
-                <View style={styles.headerRow}>
-                    <Text style={styles.name}>{item.name}</Text>
+                {/* Overlay Gradient or Badges */}
+                <View style={styles.cardHeaderOverlay}>
                     {item.is_verified && (
-                        <BadgeCheck size={18} color="#1877F2" fill="#1877F2" stroke="white" />
+                        <View style={styles.verifiedTag}>
+                            <BadgeCheck size={14} color="#FFF" fill="#3B82F6" />
+                            <Text style={styles.verifiedText}>Verified</Text>
+                        </View>
                     )}
+                    <View style={styles.heartButton}>
+                        <Heart size={16} color="#111" />
+                    </View>
                 </View>
-                <Text style={styles.desc} numberOfLines={2}>{item.description || 'Delicious food waiting for you.'}</Text>
+            </View>
+
+            <View style={styles.info}>
+                <View style={styles.mainInfoRow}>
+                    <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+                </View>
+
+                <Text style={styles.desc} numberOfLines={1}>{item.description || 'Delicious food & quick delivery.'}</Text>
+
                 <View style={styles.metaRow}>
-                    <Text style={styles.metaText}>{item.location || 'Location Info'}</Text>
-                    <Text style={styles.metaText}>•</Text>
-                    <Text style={styles.metaText}>20-30 min</Text>
+                    <View style={styles.metaItem}>
+                        <Clock size={14} color="#6B7280" />
+                        <Text style={styles.metaText}>40-55 min</Text>
+                    </View>
+                    <Text style={styles.dot}>•</Text>
+                    <View style={styles.metaItem}>
+                        <MapPin size={14} color="#6B7280" />
+                        <Text style={styles.metaText}>{item.location || '2.5 km'}</Text>
+                    </View>
                 </View>
             </View>
         </TouchableOpacity>
     );
 
+    const renderHeader = () => {
+        // Only show Hub sections if we are in 'all' mode and NOT searching
+        if (type !== 'all' && type !== undefined) return null;
+        if (searchQuery.length > 0) return null;
+
+        return (
+            <View>
+                {/* Verified Brands Section */}
+                {verifiedBrands.length > 0 && (
+                    <View style={styles.section}>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionHeading}>Verified Brands</Text>
+                            <TouchableOpacity onPress={() => router.push('/list/verified')}>
+                                <Text style={styles.seeAllText}>See all</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <FlatList
+                            data={verifiedBrands}
+                            renderItem={renderBrand}
+                            keyExtractor={(item) => item.id.toString()}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={styles.horizontalScroll}
+                        />
+                    </View>
+                )}
+                {/* Top Brands Section (Optional) */}
+                {popularBrands.length > 0 && (
+                    <View style={styles.section}>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionHeading}>Top Brands</Text>
+                            <TouchableOpacity onPress={() => router.push('/list/popular')}>
+                                <Text style={styles.seeAllText}>See all</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <FlatList
+                            data={popularBrands}
+                            renderItem={renderBrand}
+                            keyExtractor={(item) => item.id.toString()}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={styles.horizontalScroll}
+                        />
+                    </View>
+                )}
+                <Text style={[styles.sectionHeading, { paddingHorizontal: 16, marginBottom: 12, marginTop: 10 }]}>All Restaurants</Text>
+            </View>
+        );
+    };
+
     const getTitle = () => {
         if (type === 'verified') return 'Verified Brands';
         if (type === 'popular') return 'Top Brands';
-        if (type === 'all') return 'All Restaurants';
         return 'Restaurants';
     };
 
@@ -119,6 +208,7 @@ export default function RestaurantListScreen() {
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.listContent}
                     showsVerticalScrollIndicator={false}
+                    ListHeaderComponent={renderHeader}
                     ListEmptyComponent={
                         <View style={styles.center}>
                             <Text style={styles.emptyText}>No restaurants found.</Text>
@@ -148,8 +238,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 12,
         backgroundColor: '#FFF',
-        borderBottomWidth: 1,
-        borderBottomColor: '#F3F4F6',
     },
     backBtn: {
         padding: 4,
@@ -158,99 +246,227 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginHorizontal: 16,
-        marginVertical: 12,
+        marginBottom: 12,
         paddingHorizontal: 16,
-        paddingVertical: 10,
+        paddingVertical: 12, // Taller search bar
         backgroundColor: '#FFF',
-        borderRadius: 25,
+        borderRadius: 16,
         borderWidth: 1,
         borderColor: '#E5E7EB',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 2,
     },
     searchInput: {
         flex: 1,
         marginLeft: 10,
-        fontSize: 14,
+        fontSize: 15,
         color: '#1F2937',
         fontFamily: Platform.select({ ios: 'System', android: 'Roboto' }),
         paddingVertical: 0,
     },
     headerTitle: {
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: 20,
+        fontWeight: '800',
         color: '#111',
     },
     listContent: {
-        padding: 16,
         paddingBottom: 40,
     },
 
-    // Card Styles
-    card: {
-        flexDirection: 'row', // Horizontal
-        backgroundColor: '#FFF',
-        borderRadius: 12,
+    // SECTION STYLES
+    section: {
+        marginBottom: 24,
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
         marginBottom: 12,
-        overflow: 'hidden',
+    },
+    sectionHeading: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: '#111',
+    },
+    seeAllText: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#FF4500', // Our App Color
+    },
+    horizontalScroll: {
+        paddingHorizontal: 16,
+    },
+
+    // BRAND CARD (Horizontal)
+    brandCard: {
+        width: 80,
+        marginRight: 16,
+        alignItems: 'center',
+    },
+    brandImageContainer: {
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        backgroundColor: '#FFF',
+        marginBottom: 8,
         borderWidth: 1,
-        borderColor: '#F3F4F6',
-        height: 100, // Fixed compact height
+        borderColor: '#E5E7EB',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    brandLogo: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 35,
+        resizeMode: 'cover',
+    },
+    brandVerifiedBadge: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: '#FFF',
+        borderRadius: 10,
+        padding: 2,
+    },
+    brandName: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#374151',
+        textAlign: 'center',
+    },
+
+    // MAIN RESTAURANT CARD (Vertical)
+    card: {
+        marginHorizontal: 16,
+        marginBottom: 20,
+        backgroundColor: '#FFF',
+        borderRadius: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 10,
+        elevation: 4,
+        overflow: 'visible', // For shadow
     },
     imageContainer: {
-        width: 100, // Square image on left
-        height: '100%',
-        backgroundColor: '#F3F4F6',
+        height: 160,
+        width: '100%',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        overflow: 'hidden',
         position: 'relative',
+        backgroundColor: '#F3F4F6',
     },
     image: {
         width: '100%',
         height: '100%',
         resizeMode: 'cover',
     },
-    badge: {
+    cardHeaderOverlay: {
         position: 'absolute',
         top: 12,
         left: 12,
-        backgroundColor: '#FF4500',
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 8,
+        right: 12,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
-    badgeText: {
-        color: '#FFF',
-        fontWeight: 'bold',
-        fontSize: 12,
-    },
-    info: {
-        flex: 1, // Take remaining space
-        padding: 10,
-        justifyContent: 'center',
-    },
-    headerRow: {
+    verifiedTag: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 20,
+        gap: 4,
+    },
+    verifiedText: {
+        fontSize: 11,
+        fontWeight: '700',
+        color: '#111',
+    },
+    heartButton: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: '#FFF',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    info: {
+        padding: 16,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        backgroundColor: '#FFF',
+    },
+    mainInfoRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginBottom: 6,
     },
     name: {
         fontSize: 18,
-        fontWeight: '700',
+        fontWeight: '800',
         color: '#111',
+        flex: 1,
+        marginRight: 8,
+    },
+    ratingBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#111', // Black Badge
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+        gap: 4,
+    },
+    ratingScore: {
+        color: '#FFF',
+        fontSize: 12,
+        fontWeight: '700',
     },
     desc: {
-        fontSize: 14,
+        fontSize: 13,
         color: '#6B7280',
-        marginBottom: 10,
-        lineHeight: 20,
+        marginBottom: 12,
     },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        flexWrap: 'wrap',
+    },
+    metaItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
     },
     metaText: {
         fontSize: 13,
-        color: '#9CA3AF',
+        color: '#4B5563',
         fontWeight: '500',
+    },
+    dot: {
+        marginHorizontal: 8,
+        color: '#9CA3AF',
+    },
+    deliveryFee: {
+        color: '#FF4500',
+        fontWeight: '700',
+        fontSize: 13,
     },
     emptyText: {
         fontSize: 16,

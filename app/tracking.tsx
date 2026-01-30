@@ -49,7 +49,7 @@ export default function TrackingScreen() {
                 </View>
 
                 <View style={styles.timelineContainer}>
-                    <Text style={styles.estimatedTime}>Estimated Delivery: 20-30 min</Text>
+                    <Text style={styles.estimatedTime}>Estimated Delivery: 40-55 min</Text>
 
                     <View style={styles.timeline}>
                         {STEPS.map((step, index) => {

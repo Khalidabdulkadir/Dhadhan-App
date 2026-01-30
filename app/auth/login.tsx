@@ -1,7 +1,7 @@
 import { useAuthStore } from '@/store/useAuthStore';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
@@ -34,90 +34,81 @@ export default function LoginScreen() {
         <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={{ flex: 1 }}
+                style={{ flex: 1, justifyContent: 'center' }}
             >
-                <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: Platform.OS === 'ios' ? 20 : 150 }]}>
-                    <View style={styles.content}>
-                        <View style={styles.logoContainer}>
-                            <Image
-                                source={require('../../assets/images/icon.png')}
-                                style={styles.logo}
+                <View style={styles.content}>
+                    <View style={styles.logoContainer}>
+                        <Image
+                            source={require('../../assets/images/icon4.png')}
+                            style={styles.logo}
+                        />
+                    </View>
+
+                    <View style={styles.formCard}>
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Email</Text>
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    focusedInput === 'username' && styles.inputFocused
+                                ]}
+                                placeholder="Enter your email"
+                                placeholderTextColor="#999"
+                                value={username}
+                                onChangeText={setUsername}
+                                autoCapitalize="none"
+                                keyboardType="email-address"
+                                onFocus={() => setFocusedInput('username')}
+                                onBlur={() => setFocusedInput(null)}
                             />
-                            <Text style={styles.appName}>Dhadhan</Text>
                         </View>
 
-                        <View style={styles.formCard}>
-                            <Text style={styles.title}>Welcome Back</Text>
-                            <Text style={styles.subtitle}>Sign in to your account</Text>
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Password</Text>
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    focusedInput === 'password' && styles.inputFocused
+                                ]}
+                                placeholder="Enter your password"
+                                placeholderTextColor="#999"
+                                value={password}
+                                onChangeText={setPassword}
+                                secureTextEntry
+                                onFocus={() => setFocusedInput('password')}
+                                onBlur={() => setFocusedInput(null)}
+                            />
+                        </View>
 
-                            <View style={styles.inputGroup}>
-                                <Text style={styles.label}>Email</Text>
-                                <TextInput
-                                    style={[
-                                        styles.input,
-                                        focusedInput === 'username' && styles.inputFocused
-                                    ]}
-                                    placeholder="Enter your email"
-                                    placeholderTextColor="#999"
-                                    value={username}
-                                    onChangeText={setUsername}
-                                    autoCapitalize="none"
-                                    keyboardType="email-address"
-                                    onFocus={() => setFocusedInput('username')}
-                                    onBlur={() => setFocusedInput(null)}
-                                />
-                            </View>
+                        <TouchableOpacity
+                            style={[styles.button, loading && styles.buttonDisabled]}
+                            onPress={handleLogin}
+                            disabled={loading}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={styles.buttonText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
+                        </TouchableOpacity>
 
-                            <View style={styles.inputGroup}>
-                                <Text style={styles.label}>Password</Text>
-                                <TextInput
-                                    style={[
-                                        styles.input,
-                                        focusedInput === 'password' && styles.inputFocused
-                                    ]}
-                                    placeholder="Enter your password"
-                                    placeholderTextColor="#999"
-                                    value={password}
-                                    onChangeText={setPassword}
-                                    secureTextEntry
-                                    onFocus={() => setFocusedInput('password')}
-                                    onBlur={() => setFocusedInput(null)}
-                                />
-                            </View>
-
-                            <TouchableOpacity
-                                style={[styles.button, loading && styles.buttonDisabled]}
-                                onPress={handleLogin}
-                                disabled={loading}
-                                activeOpacity={0.8}
-                            >
-                                <Text style={styles.buttonText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
-                            </TouchableOpacity>
-
-                            <View style={styles.footer}>
-                                <Text style={styles.footerText}>Don't have an account? </Text>
-                                <Link href={"/auth/register" as any} asChild>
-                                    <TouchableOpacity>
-                                        <Text style={styles.link}>Sign Up</Text>
-                                    </TouchableOpacity>
-                                </Link>
-                            </View>
+                        <View style={styles.footer}>
+                            <Text style={styles.footerText}>Don't have an account? </Text>
+                            <Link href={"/auth/register" as any} asChild>
+                                <TouchableOpacity>
+                                    <Text style={styles.link}>Sign Up</Text>
+                                </TouchableOpacity>
+                            </Link>
                         </View>
                     </View>
-                </ScrollView>
+                </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
 
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F8F9FA',
-    },
-    scrollContent: {
-        flexGrow: 1,
-        justifyContent: 'center',
     },
     content: {
         padding: 24,
@@ -132,12 +123,6 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         borderRadius: 20,
     },
-    appName: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#1A1A1A',
-        letterSpacing: 0.5,
-    },
     formCard: {
         backgroundColor: '#FFFFFF',
         borderRadius: 24,
@@ -150,19 +135,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.05,
         shadowRadius: 12,
         elevation: 4,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#1A1A1A',
-        marginBottom: 8,
-        textAlign: 'center',
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#666',
-        textAlign: 'center',
-        marginBottom: 32,
     },
     inputGroup: {
         marginBottom: 20,

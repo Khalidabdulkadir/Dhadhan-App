@@ -1,11 +1,10 @@
-
 import { CartItem, useCartStore } from '@/store/useCartStore';
 import { logOrderClick } from '@/utils/analytics';
 import { getImageUrl } from '@/utils/image';
 import { useRouter } from 'expo-router';
 import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react-native';
 import React from 'react';
-import { FlatList, Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CartScreen() {
@@ -28,15 +27,15 @@ export default function CartScreen() {
                 <View style={styles.actionsContainer}>
                     <View style={styles.quantityControl}>
                         <TouchableOpacity onPress={() => decrementQuantity(item.id)} style={styles.qtyButton}>
-                            <Minus size={14} color="#111" />
+                            <Minus size={16} color="#111" />
                         </TouchableOpacity>
                         <Text style={styles.qtyText}>{item.quantity}</Text>
                         <TouchableOpacity onPress={() => incrementQuantity(item.id)} style={styles.qtyButton}>
-                            <Plus size={14} color="#111" />
+                            <Plus size={16} color="#111" />
                         </TouchableOpacity>
                     </View>
                     <TouchableOpacity onPress={() => removeItem(item.id)} style={styles.removeButton}>
-                        <Trash2 size={16} color="#EF4444" />
+                        <Trash2 size={18} color="#EF4444" />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -47,12 +46,12 @@ export default function CartScreen() {
         return (
             <SafeAreaView style={styles.emptyContainer}>
                 <View style={styles.emptyIconContainer}>
-                    <ShoppingBag size={60} color="#DDD" />
+                    <ShoppingBag size={64} color="#D1D5DB" />
                 </View>
                 <Text style={styles.emptyTitle}>Your Cart is Empty</Text>
-                <Text style={styles.emptyText}>Looks like you haven't added anything yet.</Text>
+                <Text style={styles.emptyText}>Find your next favorite meal!</Text>
                 <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/(tabs)/menu')}>
-                    <Text style={styles.shopButtonText}>Start Shopping</Text>
+                    <Text style={styles.shopButtonText}>Start Exploring</Text>
                 </TouchableOpacity>
             </SafeAreaView>
         );
@@ -126,29 +125,30 @@ export default function CartScreen() {
     const restaurantNumber = restaurant?.whatsapp_number;
 
     const renderFooter = () => (
-        <View style={{ paddingBottom: 20 }}>
+        <View style={{ paddingBottom: 24, paddingHorizontal: 4 }}>
             {/* Payment Info in Scrollable Area */}
             {(restaurantNumber || restaurant?.bank_name || restaurant?.paybill_number || restaurant?.till_number) && (
                 <View style={styles.paymentInfo}>
-                    <Text style={styles.paymentHeader}>Payment Details:</Text>
-
-
-
+                    <Text style={styles.paymentHeader}>Payment Details</Text>
                     {/* Paybill */}
                     {restaurant?.paybill_number && (
-                        <Text style={styles.paymentInfoText}>Paybill: <Text style={styles.paymentPhone}>{restaurant.paybill_number}</Text></Text>
+                        <View style={styles.paymentRow}>
+                            <Text style={styles.paymentLabel}>Paybill:</Text>
+                            <Text style={styles.paymentValue}>{restaurant.paybill_number}</Text>
+                        </View>
                     )}
-
                     {/* Till */}
                     {restaurant?.till_number && (
-                        <Text style={styles.paymentInfoText}>Till No: <Text style={styles.paymentPhone}>{restaurant.till_number}</Text></Text>
+                        <View style={styles.paymentRow}>
+                            <Text style={styles.paymentLabel}>Till No:</Text>
+                            <Text style={styles.paymentValue}>{restaurant.till_number}</Text>
+                        </View>
                     )}
-
                     {/* Bank */}
                     {restaurant?.bank_name && (
-                        <View style={{ marginTop: 4 }}>
-                            <Text style={styles.paymentInfoText}>Bank: {restaurant.bank_name}</Text>
-                            <Text style={styles.paymentInfoText}>Acc: <Text style={styles.paymentPhone}>{restaurant.bank_account_number}</Text></Text>
+                        <View style={{ marginTop: 8 }}>
+                            <Text style={styles.paymentLabel}>Bank: {restaurant.bank_name}</Text>
+                            <Text style={styles.paymentLabel}>Acc: <Text style={styles.paymentValue}>{restaurant.bank_account_number}</Text></Text>
                         </View>
                     )}
                 </View>
@@ -157,204 +157,166 @@ export default function CartScreen() {
     );
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>My Cart ({items.length})</Text>
-            </View>
-
-            <FlatList
-                data={items}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-                contentContainerStyle={styles.listContent}
-                showsVerticalScrollIndicator={false}
-                ListFooterComponent={renderFooter}
-            />
-
-            <View style={styles.footer}>
-                <View style={styles.summaryContainer}>
-                    <View style={styles.summaryRow}>
-                        <Text style={styles.summaryLabel}>Subtotal</Text>
-                        <Text style={styles.summaryValue}>KSh {subtotal.toFixed(0)}</Text>
-                    </View>
-                    <View style={styles.summaryRow}>
-                        <Text style={styles.summaryLabel}>Delivery Fee</Text>
-                        {deliveryFee > 0 ? (
-                            <Text style={styles.summaryValue}>KSh {deliveryFee.toFixed(0)}</Text>
-                        ) : (
-                            <Text style={[styles.summaryValue, { color: '#10B981' }]}>Free</Text>
-                        )}
-                    </View>
-                    <View style={styles.divider} />
-                    <View style={styles.totalRow}>
-                        <Text style={styles.totalLabel}>Total</Text>
-                        <Text style={styles.totalValue}>KSh {total.toFixed(0)}</Text>
+        <View style={styles.container}>
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={styles.header}>
+                    <Text style={styles.headerTitle}>My Cart</Text>
+                    <View style={styles.badgeContainer}>
+                        <Text style={styles.badgeText}>{items.length}</Text>
                     </View>
                 </View>
 
-                <View style={{ gap: 12 }}>
-                    <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout} activeOpacity={0.9}>
-                        <Text style={styles.checkoutButtonText}>Order via WhatsApp</Text>
-                    </TouchableOpacity>
+                <FlatList
+                    data={items}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={styles.listContent}
+                    showsVerticalScrollIndicator={false}
+                    ListFooterComponent={renderFooter}
+                />
 
-                    <TouchableOpacity
-                        style={styles.callButton}
-                        onPress={handleCallOrder}
-                        activeOpacity={0.8}
-                    >
-                        <Text style={styles.callButtonText}>Call to Order</Text>
-                    </TouchableOpacity>
+                <View style={styles.footer}>
+                    <View style={styles.summaryContainer}>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Subtotal</Text>
+                            <Text style={styles.summaryValue}>KSh {subtotal.toFixed(0)}</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Delivery Fee</Text>
+                            {deliveryFee > 0 ? (
+                                <Text style={styles.summaryValue}>KSh {deliveryFee.toFixed(0)}</Text>
+                            ) : (
+                                <Text style={[styles.summaryValue, { color: '#059669' }]}>Free</Text>
+                            )}
+                        </View>
+                        <View style={styles.divider} />
+                        <View style={styles.totalRow}>
+                            <Text style={styles.totalLabel}>Total</Text>
+                            <Text style={styles.totalValue}>KSh {total.toFixed(0)}</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.actionButtons}>
+                        <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout} activeOpacity={0.9}>
+                            <Text style={styles.checkoutButtonText}>Order via WhatsApp</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.callButton}
+                            onPress={handleCallOrder}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={styles.callButtonText}>Call Restaurant</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-            </View>
-        </SafeAreaView>
+            </SafeAreaView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F8F9FA',
-    },
-    // ... existing styles ...
-    paymentInfo: {
-        backgroundColor: '#E0F2FE',
-        padding: 10,
-        borderRadius: 10,
-        marginBottom: 15,
-        alignItems: 'center',
-    },
-    paymentInfoText: {
-        color: '#0369A1',
-        fontWeight: '600',
-    },
-    paymentPhone: {
-        fontWeight: '800',
-        fontSize: 16,
-    },
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F8F9FA',
-        padding: 40,
-    },
-    emptyIconContainer: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        backgroundColor: '#FFF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 20,
-        elevation: 2,
-    },
-    emptyTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 10,
-    },
-    emptyText: {
-        fontSize: 16,
-        color: '#888',
-        marginBottom: 30,
-        textAlign: 'center',
-    },
-    shopButton: {
-        backgroundColor: '#FF4500',
-        paddingHorizontal: 40,
-        paddingVertical: 18,
-        borderRadius: 30,
-        elevation: 4,
-        shadowColor: '#FF4500',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-    },
-    shopButtonText: {
-        color: '#FFF',
-        fontSize: 16,
-        fontWeight: 'bold',
+        backgroundColor: '#F9FAFB', // Cool gray background
     },
     header: {
         paddingHorizontal: 20,
-        paddingTop: 20,
-        paddingBottom: 10,
-        backgroundColor: '#F8F9FA',
+        paddingTop: 10,
+        paddingBottom: 4,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
     },
     headerTitle: {
-        fontSize: 32,
+        fontSize: 34,
         fontWeight: '800',
-        color: '#111',
-        letterSpacing: -0.5,
+        color: '#111827',
+        letterSpacing: -1,
+    },
+    badgeContainer: {
+        backgroundColor: '#FF4500',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+    },
+    badgeText: {
+        color: '#FFF',
+        fontSize: 14,
+        fontWeight: 'bold',
     },
     listContent: {
         paddingHorizontal: 20,
-        paddingTop: 10,
-        paddingBottom: 180, // Increased space for floating footer + payment info
+        paddingTop: 16,
+        paddingBottom: 220, // Space for footer
     },
     cartItem: {
         flexDirection: 'row',
-        backgroundColor: '#FFF',
-        borderRadius: 16,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
         padding: 12,
         marginBottom: 16,
-        borderColor: '#F3F4F6',
+        // Modern shadow
+        shadowColor: '#6B7280',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 3,
         borderWidth: 1,
-        // No Shadow -> Flat Design
+        borderColor: '#F3F4F6',
     },
     itemImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 12,
+        width: 88,
+        height: 88,
+        borderRadius: 16,
         backgroundColor: '#F3F4F6',
     },
     itemContent: {
         flex: 1,
         marginLeft: 14,
         justifyContent: 'space-between',
+        paddingVertical: 2,
     },
     restaurantNameSmall: {
         fontSize: 11,
         color: '#9CA3AF',
-        fontWeight: '600',
-        marginBottom: 2,
+        fontWeight: '700',
         textTransform: 'uppercase',
+        letterSpacing: 0.5,
+        marginBottom: 2,
     },
     itemName: {
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: '700',
         color: '#1F2937',
-        marginBottom: 4,
         lineHeight: 20,
+        marginBottom: 4,
     },
     itemPrice: {
-        fontSize: 15,
-        fontWeight: "700",
+        fontSize: 16,
+        fontWeight: '800',
         color: '#FF4500',
     },
     actionsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 8,
+        marginTop: 6,
     },
     quantityControl: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#F3F4F6',
-        borderRadius: 24,
-        paddingHorizontal: 4,
-        paddingVertical: 4,
+        borderRadius: 12,
+        padding: 4,
     },
     qtyButton: {
-        width: 28,
-        height: 28,
+        width: 30,
+        height: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FFF',
-        borderRadius: 14,
-        // Small shadow for button
+        backgroundColor: '#FFFFFF',
+        borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
@@ -362,31 +324,36 @@ const styles = StyleSheet.create({
         elevation: 1,
     },
     qtyText: {
-        width: 24,
+        width: 32,
         textAlign: 'center',
         fontWeight: '700',
-        fontSize: 14,
+        fontSize: 15,
         color: '#111',
     },
     removeButton: {
-        padding: 6,
+        padding: 8,
+        backgroundColor: '#FEF2F2',
+        borderRadius: 10,
     },
+
+    // FOOTER
     footer: {
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#FFF',
+        backgroundColor: '#FFFFFF',
         paddingHorizontal: 24,
-        paddingTop: 20,
-        paddingBottom: 30, // Safe area
+        paddingTop: 24,
+        paddingBottom: Platform.OS === 'ios' ? 34 : 24,
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
-        elevation: 20,
+        // Stronger shadow for floating feel
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -8 },
         shadowOpacity: 0.08,
-        shadowRadius: 16,
+        shadowRadius: 24,
+        elevation: 20,
     },
     summaryContainer: {
         marginBottom: 20,
@@ -394,7 +361,7 @@ const styles = StyleSheet.create({
     summaryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 10,
+        marginBottom: 8,
     },
     summaryLabel: {
         color: '#6B7280',
@@ -414,7 +381,7 @@ const styles = StyleSheet.create({
     totalRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 0,
+        alignItems: 'flex-end',
     },
     totalLabel: {
         fontSize: 18,
@@ -422,44 +389,119 @@ const styles = StyleSheet.create({
         color: '#111',
     },
     totalValue: {
-        fontSize: 22,
-        fontWeight: '800',
+        fontSize: 26,
+        fontWeight: '900',
         color: '#FF4500',
+        letterSpacing: -0.5,
+    },
+    actionButtons: {
+        gap: 12,
     },
     checkoutButton: {
-        backgroundColor: '#FF4500',
+        backgroundColor: '#111827', // Dark modern button
         paddingVertical: 18,
-        borderRadius: 100, // Pill shape
+        borderRadius: 20,
         alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
         elevation: 4,
+    },
+    checkoutButtonText: {
+        color: '#FFF',
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    callButton: {
+        backgroundColor: '#EFF6FF',
+        paddingVertical: 16,
+        borderRadius: 20,
+        alignItems: 'center',
+    },
+    callButtonText: {
+        color: '#1D4ED8',
+        fontSize: 16,
+        fontWeight: '700',
+    },
+
+    // PAYMENT INFO
+    paymentInfo: {
+        backgroundColor: '#EFF6FF',
+        padding: 16,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#DBEAFE',
+    },
+    paymentHeader: {
+        fontSize: 14,
+        fontWeight: '800',
+        color: '#1E3A8A',
+        marginBottom: 8,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    paymentRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    paymentLabel: {
+        color: '#3B82F6',
+        fontWeight: '600',
+        fontSize: 14,
+        marginRight: 6,
+    },
+    paymentValue: {
+        color: '#1E40AF',
+        fontWeight: '800',
+        fontSize: 15,
+    },
+
+    // EMPTY STATE
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F9FAFB',
+        padding: 40,
+    },
+    emptyIconContainer: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: '#F3F4F6',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 24,
+    },
+    emptyTitle: {
+        fontSize: 24,
+        fontWeight: '800',
+        color: '#111827',
+        marginBottom: 12,
+        textAlign: 'center',
+    },
+    emptyText: {
+        fontSize: 16,
+        color: '#6B7280',
+        marginBottom: 32,
+        textAlign: 'center',
+    },
+    shopButton: {
+        backgroundColor: '#FF4500',
+        paddingHorizontal: 32,
+        paddingVertical: 16,
+        borderRadius: 100,
         shadowColor: '#FF4500',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.25,
         shadowRadius: 8,
+        elevation: 4,
     },
-    checkoutButtonText: {
+    shopButtonText: {
         color: '#FFF',
-        fontSize: 17,
-        fontWeight: '700',
-    },
-    callButton: {
-        backgroundColor: '#FFF',
-        paddingVertical: 16,
-        borderRadius: 100,
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#E5E7EB',
-    },
-    callButtonText: {
-        color: '#4B5563',
         fontSize: 16,
-        fontWeight: '600',
-    },
-    paymentHeader: {
-        fontSize: 14,
         fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 6,
-        alignSelf: 'flex-start',
     },
 });

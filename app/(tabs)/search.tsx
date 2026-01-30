@@ -1,4 +1,5 @@
 
+import EmptyState from '@/components/EmptyState';
 import api from '@/constants/api';
 import { getImageUrl } from '@/utils/image';
 import { useRouter } from 'expo-router';
@@ -141,10 +142,11 @@ export default function SearchScreen() {
                     showsVerticalScrollIndicator={false}
                 />
             ) : searchQuery.length > 0 ? (
-                <View style={styles.emptyState}>
-                    <Text style={styles.emptyText}>No results found</Text>
-                    <Text style={styles.emptySubtext}>Try searching for something else</Text>
-                </View>
+                <EmptyState
+                    title="No Results Found"
+                    message={`No results found for "${searchQuery}".`}
+                    style={{ marginTop: 60 }}
+                />
             ) : (
                 <View>
                     {promotions.length > 0 && (
